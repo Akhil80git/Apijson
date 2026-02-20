@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌳 API Tree Pro · Response Analyzer</title>
+    <!-- Bootstrap 5 + Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --nav-width: 260px;
+            --bg-light: #f8fafd;
+            --bg-dark: #1a1e24;
+            --card-light: #ffffff;
+            --card-dark: #2a2f38;
+            --text-light: #1e293b;
+            --text-dark: #f1f5f9;
+            --border-light: #e2e8f0;
+            --border-dark: #334155;
+            
+            /* Response status colors */
+            --success-bg: #dcfce7;
+            --success-text: #166534;
+            --warning-bg: #fef9c3;
+            --warning-text: #854d0e;
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+            --info-bg: #dbeafe;
+            --info-text: #1e40af;
+            
+            /* Group Colors */
+            --line-login: #ef4444;
+            --line-register: #10b981;
+            --line-otp: #f59e0b;
+            --line-verify: #8b5cf6;
+            --line-profile: #3b82f6;
+            --line-update: #f97316;
+            --line-refresh: #06b6d4;
+            --line-forget: #ec4899;
+            --line-logout: #6b7280;
+            --line-reset: #14b8a6;
+            
+            /* Custom colors */
+            --custom-1: #a855f7;
+            --custom-2: #d946ef;
+            --custom-3: #c084fc;
+            --custom-4: #b380ff;
+            --custom-5: #a78bfa;
+        }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            transition: background-color 0.2s, color 0.2s;
+            font-size: 0.9rem;
+        }
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+        
+        /* Dark mode styles */
+        body.dark-mode .api-nav {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        body.dark-mode .nav-header {
+            color: #94a3b8;
+            border-bottom-color: #334155;
+        }
+        body.dark-mode .nav-tree-group-header {
+            color: #e2e8f0;
+        }
+        body.dark-mode .nav-tree-group-header:hover {
+            background: #2d3a4f;
+        }
+        body.dark-mode .nav-tree-item {
+            color: #cbd5e1;
+        }
+        body.dark-mode .nav-tree-item:hover {
+            background: #2d3a4f;
+        }
+        body.dark-mode .nav-tree-item.main {
+            background: #1e3a5f;
+        }
+        body.dark-mode .nav-tree-item.custom-group {
+            background: #3a1e4f;
+        }
+        body.dark-mode .api-row {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        body.dark-mode .response-header {
+            background: #0f172a;
+            border-bottom-color: #334155;
+        }
+        body.dark-mode .response-metrics {
+            background: #1e293b;
+        }
+        body.dark-mode .metric-item {
+            background: #0f172a;
+        }
+        body.dark-mode .request-header {
+            background: #0f172a;
+            border-bottom-color: #334155;
+        }
+        
+        .app-layout {
+            display: flex;
+            gap: 1rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        /* Navigation */
+        .api-nav {
+            width: var(--nav-width);
+            flex-shrink: 0;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            height: fit-content;
+            position: sticky;
+            top: 0.8rem;
+            max-height: calc(100vh - 1.6rem);
+            border: 1px solid rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .nav-header {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #64748b;
+            padding: 1rem 0.6rem 0.6rem 0.6rem;
+            border-bottom: 1px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+        
+        .nav-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.4rem 0.4rem 0.4rem 0.4rem;
+            max-height: calc(100vh - 12rem);
+        }
+        
+        .nav-footer {
+            padding: 0.8rem 0.6rem;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+            flex-shrink: 0;
+        }
+        body.dark-mode .nav-footer {
+            background: #1e293b;
+            border-top-color: #334155;
+        }
+        
+        .add-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.6rem 1rem;
+            border-radius: 40px;
+            background: linear-gradient(135deg, #a855f7 0%, #c084fc 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.15s;
+            border: none;
+            width: 100%;
+        }
+        .add-button:hover {
+            background: linear-gradient(135deg, #9333ea 0%, #a855f7 100%);
+        }
+        
+        /* Tree Navigation */
+        .nav-tree-group {
+            margin: 0.4rem 0;
+        }
+        .nav-tree-group-header {
+            display: flex;
+            align-items: center;
+            padding: 0.4rem 0.6rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            border-radius: 30px;
+            border-left: 3px solid transparent;
+        }
+        .nav-tree-group-header i:first-child {
+            margin-right: 6px;
+            font-size: 0.8rem;
+        }
+        .nav-tree-group-header .group-toggle {
+            margin-left: auto;
+            transition: transform 0.2s;
+            font-size: 0.7rem;
+        }
+        .nav-tree-group-header.collapsed .group-toggle {
+            transform: rotate(-90deg);
+        }
+        .nav-tree-group-header:hover {
+            background: #f1f5f9;
+        }
+        
+        .nav-tree-items {
+            margin-left: 1.2rem;
+        }
+        .nav-tree-items.collapsed {
+            display: none;
+        }
+        
+        .nav-tree-item {
+            display: flex;
+            align-items: center;
+            padding: 0.3rem 0.6rem 0.3rem 1.8rem;
+            margin: 0.1rem 0;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .nav-tree-item .tree-line {
+            position: absolute;
+            left: 6px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            border-left: 1px dotted #cbd5e1;
+        }
+        .nav-tree-item .eye-icon {
+            margin-right: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+        .nav-tree-item.hidden .item-name {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+        .nav-tree-item.main {
+            background: #eff6ff;
+        }
+        .nav-tree-item.custom-group {
+            background: #f3e8ff;
+        }
+        .main-badge {
+            background: #3b82f6;
+            color: white;
+            padding: 1px 6px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            margin-left: 5px;
+        }
+        .custom-badge {
+            background: #a855f7;
+            color: white;
+            padding: 1px 8px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            margin-left: 5px;
+        }
+        .locked-badge {
+            background: #64748b;
+            color: white;
+            padding: 1px 6px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            margin-left: 5px;
+        }
+        
+        /* Content Area */
+        .content-area {
+            flex-grow: 1;
+            min-width: 0;
+            height: calc(100vh - 6rem);
+            overflow-y: auto;
+            padding-right: 5px;
+            scroll-behavior: smooth;
+        }
+        
+        .api-row {
+            background: white;
+            border-radius: 20px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            border: 1px solid rgba(0,0,0,0.03);
+            border-left-width: 4px;
+            border-left-style: solid;
+            transition: all 0.3s;
+            scroll-margin-top: 1rem;
+        }
+        .api-row.hidden {
+            display: none !important;
+        }
+        .api-row.highlight {
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.3);
+            transform: scale(1.01);
+        }
+        
+        /* Dynamic border colors */
+        .api-row[data-group^="custom-"] {
+            border-left-color: var(--custom-color);
+        }
+        
+        .method-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 3px 12px;
+            border-radius: 30px;
+            min-width: 65px;
+            text-align: center;
+            display: inline-block;
+        }
+        .method-post { background: #eff6ff; color: #1e40af; }
+        .method-get { background: #e6f7e6; color: #166534; }
+        .method-put { background: #fef3c7; color: #92400e; }
+        .method-delete { background: #fee2e2; color: #991b1b; }
+        
+        .url-box {
+            background: #f8fafc;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: 1px solid #e2e8f0;
+            font-family: monospace;
+            font-size: 0.8rem;
+            width: 100%;
+        }
+        
+        .method-select {
+            font-size: 0.8rem;
+            padding: 4px 20px 4px 12px;
+            border-radius: 30px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .auth-panel {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            border: 1px solid #e2e8f0;
+            font-size: 0.8rem;
+        }
+        
+        /* Request Section New Styles */
+        .request-container {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            height: 100%;
+        }
+        
+        .request-header {
+            background: #f8fafc;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .request-textarea {
+            background: #f8fafc;
+            padding: 10px;
+            width: 100%;
+            font-family: monospace;
+            font-size: 0.8rem;
+            resize: vertical;
+            min-height: 80px;
+            height: auto;
+            overflow-y: hidden;
+            border: none;
+            border-radius: 0;
+        }
+        .request-textarea:focus {
+            outline: none;
+            background: #ffffff;
+        }
+        
+        .response-container {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .response-header {
+            background: #f8fafc;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .response-metrics {
+            display: flex;
+            gap: 1rem;
+            padding: 0.5rem 1rem;
+            background: #f1f5f9;
+            flex-wrap: wrap;
+        }
+        
+        .metric-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .metric-item i {
+            font-size: 0.9rem;
+        }
+        
+        .status-badge {
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        
+        .status-success {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+        
+        .status-warning {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+        }
+        
+        .status-error {
+            background: var(--error-bg);
+            color: var(--error-text);
+        }
+        
+        .response-pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 1rem;
+            font-size: 0.75rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 0;
+            border-top: 1px solid #334155;
+        }
+        
+        .btn-send {
+            border-radius: 30px;
+            padding: 5px 20px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            background: #3b82f6;
+            border: none;
+        }
+        .btn-send:hover {
+            background: #2563eb;
+        }
+        
+        .btn-clear {
+            border-radius: 30px;
+            padding: 5px 15px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+        }
+        .btn-clear:hover {
+            background: #e2e8f0;
+        }
+        
+        .btn-copy {
+            border-radius: 30px;
+            padding: 5px 15px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+        }
+        .btn-copy:hover {
+            background: #e2e8f0;
+        }
+        
+        .btn-format {
+            border-radius: 30px;
+            padding: 5px 15px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+        }
+        .btn-format:hover {
+            background: #e2e8f0;
+        }
+        
+        .btn-clear-request {
+            border-radius: 30px;
+            padding: 2px 10px;
+            font-weight: 500;
+            font-size: 0.7rem;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+        }
+        .btn-clear-request:hover {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+        
+        .action-btn {
+            border-radius: 30px;
+            padding: 4px 10px;
+            margin-left: 4px;
+            font-size: 0.7rem;
+        }
+        
+        .group-badge {
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 30px;
+            background: #e2e8f0;
+            margin-left: 8px;
+        }
+        
+        .group-badge.custom {
+            background: #f3e8ff;
+            color: #a855f7;
+        }
+        
+        /* Top bar */
+        .global-base {
+            background: #f1f5f9;
+            border-radius: 30px;
+            padding: 5px 15px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .port-input {
+            max-width: 100px;
+            border-radius: 30px;
+            border: 1px solid #e2e8f0;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+        }
+        
+        .theme-toggle {
+            border-radius: 30px;
+            padding: 5px 15px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        
+        .custom-counter {
+            font-size: 0.7rem;
+            color: #a855f7;
+            margin-left: 4px;
+        }
+        
+        .clear-all-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 0.2rem 1rem;
+            font-size: 0.7rem;
+            margin-left: 0.5rem;
+        }
+        .clear-all-btn:hover {
+            background: #dc2626;
+        }
+        
+        .clear-all-requests-btn {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 0.2rem 1rem;
+            font-size: 0.7rem;
+            margin-left: 0.5rem;
+        }
+        .clear-all-requests-btn:hover {
+            background: #d97706;
+        }
+        
+        /* Scroll to top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #a855f7;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: none;
+            z-index: 1000;
+        }
+        .scroll-top.visible {
+            opacity: 1;
+        }
+        .scroll-top:hover {
+            background: #9333ea;
+        }
+        
+        /* Toast message */
+        .toast-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Lock icon for main endpoints */
+        .lock-icon {
+            color: #64748b;
+            font-size: 0.8rem;
+            margin-left: 4px;
+        }
+    </style>
+</head>
+<body class="p-3">
+
+<!-- Scroll to top button -->
+<button class="scroll-top" id="scrollTopBtn" title="Scroll to top">
+    <i class="bi bi-arrow-up"></i>
+</button>
+
+<!-- Top Bar -->
+<div class="d-flex flex-wrap align-items-center justify-content-between mb-3" style="max-width: 1600px; margin: 0 auto;">
+    <div class="d-flex gap-2 align-items-center flex-wrap">
+        <span class="bg-white shadow-sm rounded-4 p-2 d-inline-flex align-items-center px-3">
+            <i class="bi bi-diagram-3 text-primary me-2" style="font-size: 1.2rem;"></i>
+            <span class="fw-bold" style="font-size: 1rem;">API Tree Pro</span>
+            <span class="badge bg-dark text-white ms-2 px-2" style="font-size: 0.6rem;">request/response analyzer</span>
+        </span>
+        <div class="d-flex gap-1">
+            <button class="clear-all-btn" id="clearAllResponsesBtn">
+                <i class="bi bi-eraser"></i> Clear All Responses
+            </button>
+            <button class="clear-all-requests-btn" id="clearAllRequestsBtn">
+                <i class="bi bi-input-cursor"></i> Clear All Request Data
+            </button>
+        </div>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <div class="global-base d-flex align-items-center gap-1">
+            <i class="bi bi-hdd-network-fill" style="font-size: 0.8rem;"></i>
+            <span>localhost</span>
+        </div>
+        <input type="number" id="portInput" class="form-control port-input" value="5000">
+        <button class="theme-toggle" id="themeToggleBtn">
+            <i class="bi bi-sun-fill" id="themeIcon"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Main Layout -->
+<div class="app-layout">
+    <!-- Navigation -->
+    <div class="api-nav">
+        <div class="nav-header">
+            <i class="bi bi-list-tree"></i> ENDPOINTS 
+            <span class="custom-counter" id="customCount">✨ 0</span>
+        </div>
+        
+        <div class="nav-content" id="navContent">
+            <div id="navTreeContainer"></div>
+        </div>
+        
+        <div class="nav-footer">
+            <button class="add-button" id="addEndpointBtn">
+                <i class="bi bi-plus-circle-fill"></i>
+                <span>New Custom Endpoint</span>
+                <span class="badge bg-white text-dark ms-auto" style="font-size: 0.6rem;">✨</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Content Area - Scrollable -->
+    <div class="content-area" id="contentArea">
+        <div id="apiCardsContainer"></div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ===== IMPORTANT: Clear old localStorage data =====
+        // This will remove any old saved data that might be causing issues
+        localStorage.removeItem('scrollData');
+        
+        // Default APIs (system endpoints - locked)
+        const DEFAULT_APIS = [
+            { name: 'Login', method: 'POST', path: '/api/auth/login', description: 'auth', body: JSON.stringify({ email: 'user@ex.com', password: '123456' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'login', isMain: true, hidden: false, isSystem: true },
+            { name: 'Login (1)', method: 'POST', path: '/api/auth/login', description: 'copy', body: '', auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'login', isMain: false, hidden: false, isSystem: false },
+            
+            { name: 'Register', method: 'POST', path: '/api/auth/register', description: 'signup', body: JSON.stringify({ username: 'test', email: 'test@a.com', password: 'secret' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'register', isMain: true, hidden: false, isSystem: true },
+            { name: 'Register (1)', method: 'POST', path: '/api/auth/register', description: 'copy', body: '', auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'register', isMain: false, hidden: false, isSystem: false },
+            
+            { name: 'OTP', method: 'POST', path: '/api/auth/otp', description: 'request', body: JSON.stringify({ phone: '+919999999999' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'otp', isMain: true, hidden: false, isSystem: true },
+            { name: 'Verify', method: 'POST', path: '/api/auth/verify', description: 'verify', body: JSON.stringify({ email: 'user@ex.com', otp: '123456' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'verify', isMain: true, hidden: false, isSystem: true },
+            { name: 'Profile', method: 'GET', path: '/api/user/profile', description: 'get', body: '', auth: { type: 'bearer', token: '' }, contentType: 'application/json', showAuth: false, group: 'profile', isMain: true, hidden: false, isSystem: true },
+            { name: 'Update', method: 'PUT', path: '/api/user/update', description: 'edit', body: JSON.stringify({ name: 'John' }, null, 2), auth: { type: 'bearer', token: '' }, contentType: 'application/json', showAuth: false, group: 'update', isMain: true, hidden: false, isSystem: true },
+            { name: 'Refresh', method: 'POST', path: '/api/auth/refresh', description: 'token', body: JSON.stringify({ refresh: 'token' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'refresh', isMain: true, hidden: false, isSystem: true },
+            { name: 'Forget', method: 'POST', path: '/api/auth/forgot', description: 'forgot', body: JSON.stringify({ email: 'forgot@ex.com' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'forget', isMain: true, hidden: false, isSystem: true },
+            { name: 'Logout', method: 'POST', path: '/api/auth/logout', description: 'out', body: '', auth: { type: 'bearer', token: '' }, contentType: 'application/json', showAuth: false, group: 'logout', isMain: true, hidden: false, isSystem: true },
+            { name: 'Reset', method: 'POST', path: '/api/auth/reset', description: 'reset', body: JSON.stringify({ pass: 'new123' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'reset', isMain: true, hidden: false, isSystem: true }
+        ];
+
+        const CUSTOM_COLORS = [
+            '#a855f7', '#d946ef', '#c084fc', '#b380ff', '#a78bfa'
+        ];
+
+        function loadApis() {
+            // Always use fresh DEFAULT_APIS to ensure system endpoints are properly marked
+            return JSON.parse(JSON.stringify(DEFAULT_APIS));
+        }
+
+        function saveApis(apis) {
+            localStorage.setItem('scrollData', JSON.stringify(apis));
+        }
+
+        let customApis = loadApis();
+        let responseMap = new Map(); // { index: { text, status, time, size, headers, formatted } }
+        let groupCollapsed = {};
+        let customCounter = 0;
+        let currentHighlight = null;
+
+        // Count custom endpoints
+        customApis.forEach(api => {
+            if (api.group && api.group.startsWith('custom-')) {
+                customCounter++;
+            }
+        });
+
+        const navContainer = document.getElementById('navTreeContainer');
+        const container = document.getElementById('apiCardsContainer');
+        const contentArea = document.getElementById('contentArea');
+        const portInput = document.getElementById('portInput');
+        const themeToggle = document.getElementById('themeToggleBtn');
+        const themeIcon = document.getElementById('themeIcon');
+        const addButton = document.getElementById('addEndpointBtn');
+        const customCountSpan = document.getElementById('customCount');
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        const clearAllResponsesBtn = document.getElementById('clearAllResponsesBtn');
+        const clearAllRequestsBtn = document.getElementById('clearAllRequestsBtn');
+
+        // Toast notification function
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'toast-message';
+            toast.style.background = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6';
+            toast.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} me-2"></i>${message}`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 2000);
+        }
+
+        // Scroll to top button
+        contentArea.addEventListener('scroll', () => {
+            if (contentArea.scrollTop > 300) {
+                scrollTopBtn.classList.add('visible');
+            } else {
+                scrollTopBtn.classList.remove('visible');
+            }
+        });
+
+        scrollTopBtn.addEventListener('click', () => {
+            contentArea.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            themeIcon.classList.toggle('bi-sun-fill');
+            themeIcon.classList.toggle('bi-moon-stars-fill');
+        });
+
+        function buildBaseUrl() {
+            let port = portInput.value.trim();
+            return `http://localhost:${port || 5000}`;
+        }
+
+        function autoResizeTextarea(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+        }
+
+        function toggleHide(index) {
+            customApis[index].hidden = !customApis[index].hidden;
+            saveApis(customApis);
+            renderNav();
+            renderCards();
+        }
+
+        // Scroll to card function
+        function scrollToCard(index) {
+            const card = document.getElementById(`card-${index}`);
+            if (card) {
+                if (currentHighlight) {
+                    currentHighlight.classList.remove('highlight');
+                }
+                
+                card.classList.add('highlight');
+                currentHighlight = card;
+                
+                card.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+                
+                setTimeout(() => {
+                    card.classList.remove('highlight');
+                    currentHighlight = null;
+                }, 2000);
+            }
+        }
+
+        // Function to clear request data for a specific card
+        function clearRequestData(index) {
+            customApis[index].body = '';
+            saveApis(customApis);
+            renderCards();
+            showToast('Request data cleared', 'info');
+        }
+
+        // Function to clear response for a specific card
+        function clearResponse(index) {
+            responseMap.delete(index);
+            renderCards();
+            showToast('Response cleared', 'info');
+        }
+
+        // Function to clear all responses
+        function clearAllResponses() {
+            responseMap.clear();
+            renderCards();
+            showToast('All responses cleared', 'success');
+        }
+
+        // Function to clear all request data
+        function clearAllRequests() {
+            customApis.forEach(api => {
+                api.body = '';
+            });
+            saveApis(customApis);
+            renderCards();
+            showToast('All request data cleared', 'success');
+        }
+
+        clearAllResponsesBtn.addEventListener('click', clearAllResponses);
+        clearAllRequestsBtn.addEventListener('click', clearAllRequests);
+
+        // Function to format JSON
+        function formatJson(text) {
+            try {
+                const obj = JSON.parse(text);
+                return JSON.stringify(obj, null, 2);
+            } catch {
+                return text;
+            }
+        }
+
+        // Function to copy text to clipboard
+        async function copyToClipboard(text, index) {
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast('Copied to clipboard!', 'success');
+            } catch (err) {
+                showToast('Failed to copy', 'error');
+            }
+        }
+
+        // Function to get status badge class
+        function getStatusClass(status) {
+            if (status >= 200 && status < 300) return 'status-success';
+            if (status >= 300 && status < 400) return 'status-warning';
+            if (status >= 400) return 'status-error';
+            return 'status-warning';
+        }
+
+        // Function to format size
+        function formatSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function addCustomEndpoint() {
+            const name = prompt('Enter custom endpoint name:', 'My API');
+            if (!name) return;
+            
+            customCounter++;
+            const groupName = `custom-${customCounter}`;
+            const colorIndex = (customCounter - 1) % CUSTOM_COLORS.length;
+            const customColor = CUSTOM_COLORS[colorIndex];
+            
+            const newApi = {
+                name: name,
+                method: 'GET',
+                path: '/api/custom',
+                description: 'custom endpoint',
+                body: '',
+                auth: { type: 'none', token: '' },
+                contentType: 'application/json',
+                showAuth: false,
+                group: groupName,
+                isMain: true,
+                hidden: false,
+                isSystem: false, // User created - not system
+                customColor: customColor
+            };
+            
+            customApis.push(newApi);
+            saveApis(customApis);
+            renderNav();
+            renderCards();
+            updateCustomCount();
+            
+            setTimeout(() => {
+                scrollToCard(customApis.length - 1);
+            }, 100);
+            
+            showToast('New endpoint added!', 'success');
+        }
+
+        function updateCustomCount() {
+            const count = customApis.filter(api => api.group && api.group.startsWith('custom-') && api.isMain).length;
+            customCountSpan.textContent = `✨ ${count}`;
+        }
+
+        addButton.addEventListener('click', addCustomEndpoint);
+
+        function renderNav() {
+            const groups = {};
+            customApis.forEach((api, idx) => {
+                if (!groups[api.group]) groups[api.group] = [];
+                groups[api.group].push({ ...api, idx });
+            });
+
+            let navHtml = '';
+            
+            for (const [group, apis] of Object.entries(groups)) {
+                const mainApi = apis.find(a => a.isMain);
+                const copies = apis.filter(a => !a.isMain);
+                const collapsed = groupCollapsed[group] ? 'collapsed' : '';
+                const isCustom = group.startsWith('custom-');
+                
+                let groupColor = `var(--line-${group})`;
+                if (isCustom && mainApi && mainApi.customColor) {
+                    groupColor = mainApi.customColor;
+                }
+                
+                navHtml += `<div class="nav-tree-group">`;
+                navHtml += `<div class="nav-tree-group-header ${collapsed}" data-group="${group}" style="border-left-color: ${groupColor};">`;
+                navHtml += `<i class="bi bi-circle-fill" style="color: ${groupColor}; font-size: 0.5rem;"></i>`;
+                
+                if (isCustom) {
+                    navHtml += `<span>✨ ${mainApi ? mainApi.name : group}</span>`;
+                } else {
+                    navHtml += `<span>${group}</span>`;
+                }
+                
+                navHtml += `<span class="badge bg-secondary ms-1" style="font-size: 0.6rem;">${apis.length}</span>`;
+                navHtml += `<i class="bi bi-chevron-down group-toggle"></i>`;
+                navHtml += `</div>`;
+                
+                navHtml += `<div class="nav-tree-items ${collapsed}" data-group-items="${group}">`;
+                
+                // Main/Custom API - Click to scroll
+                navHtml += `<div class="nav-tree-item ${isCustom ? 'custom-group' : 'main'} ${mainApi.hidden ? 'hidden' : ''}" data-nav-index="${mainApi.idx}">`;
+                navHtml += `<span class="tree-line"></span>`;
+                navHtml += `<i class="bi bi-eye${mainApi.hidden ? '-slash' : ''} eye-icon" data-eye-index="${mainApi.idx}"></i>`;
+                navHtml += `<span class="item-name">${mainApi.name}</span>`;
+                
+                if (mainApi.isSystem) {
+                    navHtml += `<span class="locked-badge"><i class="bi bi-lock-fill"></i> system</span>`;
+                } else if (isCustom) {
+                    navHtml += `<span class="custom-badge">custom</span>`;
+                } else {
+                    navHtml += `<span class="main-badge">main</span>`;
+                }
+                navHtml += `</div>`;
+                
+                // Copies - Click to scroll
+                copies.forEach(copy => {
+                    navHtml += `<div class="nav-tree-item ${copy.hidden ? 'hidden' : ''}" data-nav-index="${copy.idx}">`;
+                    navHtml += `<span class="tree-line"></span>`;
+                    navHtml += `<i class="bi bi-eye${copy.hidden ? '-slash' : ''} eye-icon" data-eye-index="${copy.idx}"></i>`;
+                    navHtml += `<span class="item-name">${copy.name}</span>`;
+                    navHtml += `</div>`;
+                });
+                
+                navHtml += `</div></div>`;
+            }
+
+            navContainer.innerHTML = navHtml;
+
+            // Group toggle
+            document.querySelectorAll('[data-group]').forEach(header => {
+                header.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('eye-icon')) return;
+                    const group = header.dataset.group;
+                    const items = document.querySelector(`[data-group-items="${group}"]`);
+                    header.classList.toggle('collapsed');
+                    items.classList.toggle('collapsed');
+                    groupCollapsed[group] = items.classList.contains('collapsed');
+                });
+            });
+
+            // Eye icon clicks
+            document.querySelectorAll('.eye-icon').forEach(icon => {
+                icon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleHide(parseInt(icon.dataset.eyeIndex));
+                });
+            });
+
+            // NAVIGATION ITEM CLICK - Scroll to card
+            document.querySelectorAll('.nav-tree-item[data-nav-index]').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('eye-icon')) return;
+                    const index = parseInt(item.dataset.navIndex);
+                    scrollToCard(index);
+                });
+            });
+        }
+
+        function duplicateApi(index) {
+            const original = customApis[index];
+            const copyCount = customApis.filter(a => a.group === original.group && !a.isMain).length + 1;
+            
+            const copy = {
+                ...JSON.parse(JSON.stringify(original)),
+                name: `${original.name} (${copyCount})`,
+                body: '',
+                showAuth: false,
+                isMain: false,
+                hidden: false,
+                isSystem: false, // Duplicates are never system endpoints
+                customColor: original.customColor
+            };
+            
+            customApis.splice(index + 1, 0, copy);
+            
+            const newMap = new Map();
+            for (let [k, v] of responseMap.entries()) {
+                if (k <= index) newMap.set(k, v);
+                else newMap.set(k + 1, v);
+            }
+            responseMap = newMap;
+            
+            saveApis(customApis);
+            renderNav();
+            renderCards();
+            
+            showToast('Endpoint duplicated', 'success');
+        }
+
+        function toggleAuth(index) {
+            customApis[index].showAuth = !customApis[index].showAuth;
+            saveApis(customApis);
+            renderCards();
+        }
+
+        function renderCards() {
+            let html = '';
+            
+            customApis.forEach((api, index) => {
+                if (api.hidden) return;
+                
+                const fullUrl = api.fullUrl || buildBaseUrl() + api.path;
+                const responseData = responseMap.get(index);
+                const isCustom = api.group.startsWith('custom-');
+                
+                const customStyle = isCustom && api.customColor ? `style="border-left-color: ${api.customColor};"` : '';
+                
+                html += `<div class="api-row" id="card-${index}" data-group="${api.group}" ${customStyle}>`;
+                
+                // Header
+                html += `<div class="d-flex flex-wrap align-items-center gap-1 mb-2">`;
+                html += `<span class="method-badge method-${api.method.toLowerCase()}">${api.method}</span>`;
+                html += `<span class="fw-semibold" style="font-size: 0.85rem;">${api.name}</span>`;
+                
+                if (api.isSystem) {
+                    html += `<span class="locked-badge"><i class="bi bi-lock-fill"></i> system</span>`;
+                } else if (api.isMain) {
+                    html += `<span class="${isCustom ? 'custom-badge' : 'main-badge'}">${isCustom ? 'custom' : 'main'}</span>`;
+                }
+                
+                html += `<span class="text-secondary small flex-grow-1">${api.description || ''}</span>`;
+                html += `<span class="group-badge ${isCustom ? 'custom' : ''}">${isCustom ? '✨ custom' : api.group}</span>`;
+                
+                html += `<div class="btn-group">`;
+                html += `<button class="btn btn-outline-secondary btn-sm action-btn" data-auth="${index}"><i class="bi bi-shield-lock"></i></button>`;
+                html += `<button class="btn btn-outline-primary btn-sm action-btn" data-duplicate="${index}"><i class="bi bi-files"></i></button>`;
+                
+                // Show delete button only for non-system endpoints
+                if (api.isSystem) {
+                    html += `<span class="btn btn-outline-secondary btn-sm action-btn disabled" style="opacity: 0.6; cursor: not-allowed;" title="System endpoint - cannot delete"><i class="bi bi-lock-fill"></i></span>`;
+                } else {
+                    html += `<button class="btn btn-outline-danger btn-sm action-btn" data-delete="${index}"><i class="bi bi-trash"></i></button>`;
+                }
+                
+                html += `</div>`;
+                html += `</div>`;
+
+                // URL Row
+                html += `<div class="d-flex gap-1 mb-2">`;
+                html += `<select class="form-select method-select" data-method="${index}" style="width: auto; min-width: 70px;">`;
+                ['GET','POST','PUT','DELETE'].forEach(m => {
+                    html += `<option value="${m}" ${api.method === m ? 'selected' : ''}>${m}</option>`;
+                });
+                html += `</select>`;
+                html += `<input type="text" class="form-control url-box" value="${api.fullUrl || api.path}" data-path="${index}">`;
+                html += `</div>`;
+
+                // Auth Panel
+                if (api.showAuth) {
+                    html += `<div class="auth-panel">`;
+                    html += `<div class="row g-2">`;
+                    html += `<div class="col-4">`;
+                    html += `<select class="form-select form-select-sm" data-auth-type="${index}">`;
+                    html += `<option value="none" ${api.auth.type === 'none' ? 'selected' : ''}>None</option>`;
+                    html += `<option value="bearer" ${api.auth.type === 'bearer' ? 'selected' : ''}>Bearer</option>`;
+                    html += `</select>`;
+                    html += `</div>`;
+                    html += `<div class="col-5">`;
+                    html += `<input type="text" class="form-control form-control-sm" value="${api.auth.token || ''}" data-auth-token="${index}" placeholder="token">`;
+                    html += `</div>`;
+                    html += `<div class="col-3">`;
+                    html += `<select class="form-select form-select-sm" data-content-type="${index}">`;
+                    html += `<option value="application/json">JSON</option>`;
+                    html += `</select>`;
+                    html += `</div>`;
+                    html += `</div>`;
+                    html += `</div>`;
+                }
+
+                // Body and Response
+                html += `<div class="row g-2 mt-1">`;
+                
+                // Request Column with Clear Button
+                html += `<div class="col-md-5">`;
+                html += `<div class="request-container">`;
+                html += `<div class="request-header">`;
+                html += `<span class="small fw-semibold"><i class="bi bi-pencil-square me-1"></i>Request Body</span>`;
+                html += `<button class="btn-clear-request btn-sm" data-clear-request="${index}"><i class="bi bi-eraser"></i> Clear</button>`;
+                html += `</div>`;
+                html += `<textarea class="form-control request-textarea" data-body="${index}" rows="2" placeholder='{\n  "key": "value"\n}'>${api.body || ''}</textarea>`;
+                html += `</div>`;
+                html += `</div>`;
+                
+                // Response Column
+                html += `<div class="col-md-7">`;
+                html += `<div class="response-container">`;
+                
+                // Response Header
+                html += `<div class="response-header">`;
+                html += `<span class="small fw-semibold"><i class="bi bi-code-square me-1"></i>Response</span>`;
+                html += `<div class="btn-group">`;
+                html += `<button class="btn btn-clear btn-sm" data-clear-response="${index}"><i class="bi bi-arrow-repeat"></i> Clear</button>`;
+                if (responseData) {
+                    html += `<button class="btn btn-copy btn-sm" data-copy-response="${index}"><i class="bi bi-clipboard"></i> Copy</button>`;
+                    html += `<button class="btn btn-format btn-sm" data-format-response="${index}"><i class="bi bi-braces"></i> Format</button>`;
+                }
+                html += `<button class="btn btn-primary btn-send btn-sm" data-send="${index}"><i class="bi bi-send"></i> Send</button>`;
+                html += `</div>`;
+                html += `</div>`;
+
+                // Response Metrics (if response exists)
+                if (responseData && responseData.status) {
+                    const statusClass = getStatusClass(responseData.status);
+                    html += `<div class="response-metrics">`;
+                    html += `<span class="status-badge ${statusClass}"><i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>${responseData.status} ${responseData.statusText || ''}</span>`;
+                    html += `<span class="metric-item"><i class="bi bi-clock-history"></i>${responseData.time}ms</span>`;
+                    html += `<span class="metric-item"><i class="bi bi-rulers"></i>${formatSize(responseData.size || 0)}</span>`;
+                    if (responseData.headers) {
+                        html += `<span class="metric-item"><i class="bi bi-tags"></i>${Object.keys(responseData.headers).length} headers</span>`;
+                    }
+                    html += `</div>`;
+                }
+
+                // Response Content
+                html += `<pre class="response-pre" id="response-${index}">${responseData ? responseData.text : 'Click "Send" to see response ...'}</pre>`;
+                html += `</div>`; // Close response-container
+                html += `</div>`; // Close col-md-7
+                html += `</div>`; // Close row
+                html += `</div>`; // Close api-row
+            });
+
+            container.innerHTML = html;
+
+            // Auto-resize textareas
+            document.querySelectorAll('[data-body]').forEach(textarea => {
+                autoResizeTextarea(textarea);
+                
+                textarea.addEventListener('input', function() {
+                    autoResizeTextarea(this);
+                    
+                    clearTimeout(this.timeout);
+                    this.timeout = setTimeout(() => {
+                        const index = parseInt(this.dataset.body);
+                        customApis[index].body = this.value;
+                        saveApis(customApis);
+                    }, 300);
+                });
+            });
+
+            // Event Listeners
+            document.querySelectorAll('[data-auth]').forEach(btn => {
+                btn.addEventListener('click', () => toggleAuth(parseInt(btn.dataset.auth)));
+            });
+
+            document.querySelectorAll('[data-duplicate]').forEach(btn => {
+                btn.addEventListener('click', () => duplicateApi(parseInt(btn.dataset.duplicate)));
+            });
+
+            // Clear request button
+            document.querySelectorAll('[data-clear-request]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const index = parseInt(btn.dataset.clearRequest);
+                    clearRequestData(index);
+                });
+            });
+
+            // Clear response button
+            document.querySelectorAll('[data-clear-response]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const index = parseInt(btn.dataset.clearResponse);
+                    clearResponse(index);
+                });
+            });
+
+            // Copy response button
+            document.querySelectorAll('[data-copy-response]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const index = parseInt(btn.dataset.copyResponse);
+                    const responseData = responseMap.get(index);
+                    if (responseData) {
+                        await copyToClipboard(responseData.text, index);
+                    }
+                });
+            });
+
+            // Format response button
+            document.querySelectorAll('[data-format-response]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const index = parseInt(btn.dataset.formatResponse);
+                    const responseData = responseMap.get(index);
+                    if (responseData) {
+                        const formatted = formatJson(responseData.text);
+                        if (formatted !== responseData.text) {
+                            responseData.text = formatted;
+                            responseData.formatted = true;
+                            responseMap.set(index, responseData);
+                            renderCards();
+                            showToast('JSON formatted', 'success');
+                        }
+                    }
+                });
+            });
+
+            document.querySelectorAll('[data-delete]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const index = parseInt(btn.dataset.delete);
+                    const api = customApis[index];
+                    
+                    // Double-check: prevent deletion of system endpoints
+                    if (api.isSystem) {
+                        showToast('System endpoints cannot be deleted', 'error');
+                        return;
+                    }
+                    
+                    if (confirm('Delete this endpoint?')) {
+                        customApis.splice(index, 1);
+                        const newMap = new Map();
+                        for (let [k, v] of responseMap.entries()) {
+                            if (k < index) newMap.set(k, v);
+                            else if (k > index) newMap.set(k-1, v);
+                        }
+                        responseMap = newMap;
+                        saveApis(customApis);
+                        updateCustomCount();
+                        renderNav();
+                        renderCards();
+                        showToast('Endpoint deleted', 'info');
+                    }
+                });
+            });
+
+            document.querySelectorAll('[data-method]').forEach(select => {
+                select.addEventListener('change', (e) => {
+                    const index = parseInt(e.target.dataset.method);
+                    customApis[index].method = e.target.value;
+                    saveApis(customApis);
+                });
+            });
+
+            document.querySelectorAll('[data-path]').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const index = parseInt(e.target.dataset.path);
+                    const val = e.target.value;
+                    if (val.startsWith('http')) {
+                        customApis[index].fullUrl = val;
+                        delete customApis[index].path;
+                    } else {
+                        customApis[index].path = val;
+                        delete customApis[index].fullUrl;
+                    }
+                    saveApis(customApis);
+                });
+            });
+
+            document.querySelectorAll('[data-auth-type]').forEach(select => {
+                select.addEventListener('change', (e) => {
+                    const index = parseInt(e.target.dataset.authType);
+                    customApis[index].auth.type = e.target.value;
+                    saveApis(customApis);
+                });
+            });
+
+            document.querySelectorAll('[data-auth-token]').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const index = parseInt(e.target.dataset.authToken);
+                    customApis[index].auth.token = e.target.value;
+                    saveApis(customApis);
+                });
+            });
+
+            document.querySelectorAll('[data-send]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const index = parseInt(btn.dataset.send);
+                    const api = customApis[index];
+                    const url = api.fullUrl || buildBaseUrl() + api.path;
+                    const responsePre = document.getElementById(`response-${index}`);
+                    
+                    try {
+                        responsePre.innerHTML = '⏳ Sending request...';
+                        
+                        const headers = { 'Accept': 'application/json' };
+                        if (api.contentType) headers['Content-Type'] = api.contentType;
+                        if (api.auth.type === 'bearer' && api.auth.token) {
+                            headers['Authorization'] = `Bearer ${api.auth.token}`;
+                        }
+                        
+                        const fetchOptions = { 
+                            method: api.method, 
+                            headers,
+                            mode: 'cors'
+                        };
+
+                        if (api.body && ['POST','PUT','PATCH'].includes(api.method)) {
+                            if (api.contentType?.includes('application/json')) {
+                                try {
+                                    JSON.parse(api.body);
+                                    fetchOptions.body = api.body;
+                                } catch (e) {
+                                    const errorMsg = `❌ Invalid JSON:\n${e.message}`;
+                                    responsePre.innerHTML = errorMsg;
+                                    responseMap.set(index, { 
+                                        text: errorMsg,
+                                        status: 400,
+                                        statusText: 'Bad Request',
+                                        time: 0,
+                                        size: errorMsg.length
+                                    });
+                                    renderCards();
+                                    return;
+                                }
+                            } else {
+                                fetchOptions.body = api.body;
+                            }
+                        }
+                        
+                        const start = performance.now();
+                        const res = await fetch(url, fetchOptions);
+                        const status = res.status;
+                        const statusText = res.statusText;
+                        const time = Math.round(performance.now() - start);
+                        
+                        const text = await res.text();
+                        const size = new Blob([text]).size;
+                        
+                        // Get headers
+                        const headersObj = {};
+                        res.headers.forEach((value, key) => {
+                            headersObj[key] = value;
+                        });
+                        
+                        let responseText = text;
+                        try {
+                            responseText = JSON.stringify(JSON.parse(text), null, 2);
+                        } catch {}
+                        
+                        const final = responseText;
+                        responsePre.innerHTML = final;
+                        
+                        responseMap.set(index, { 
+                            text: final,
+                            status: status,
+                            statusText: statusText,
+                            time: time,
+                            size: size,
+                            headers: headersObj
+                        });
+                        
+                        renderCards(); // Re-render to show metrics
+                        showToast(`Request completed in ${time}ms`, status >= 200 && status < 300 ? 'success' : 'error');
+                        
+                    } catch (err) {
+                        const errorMsg = `❌ Error: ${err.message}`;
+                        responsePre.innerHTML = errorMsg;
+                        responseMap.set(index, { 
+                            text: errorMsg,
+                            status: 0,
+                            statusText: 'Network Error',
+                            time: 0,
+                            size: errorMsg.length
+                        });
+                        renderCards();
+                        showToast('Request failed', 'error');
+                    }
+                });
+            });
+        }
+
+        renderNav();
+        renderCards();
+        updateCustomCount();
+        portInput.addEventListener('input', () => renderCards());
+    })();
+</script>
+</body>
+</html>
