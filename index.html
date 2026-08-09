@@ -678,9 +678,9 @@
 
         .btn-send {
             border-radius: 4px;
-            padding: 5px 20px;
+            padding: 3px 12px;
             font-weight: 500;
-            font-size: 0.8rem;
+            font-size: 0.72rem;
             background: #3b82f6;
             border: none;
         }
@@ -703,9 +703,9 @@
 
         .btn-copy {
             border-radius: 4px;
-            padding: 5px 15px;
+            padding: 3px 10px;
             font-weight: 500;
-            font-size: 0.8rem;
+            font-size: 0.72rem;
             background: #f1f5f9;
             color: #334155;
             border: 1px solid #e2e8f0;
@@ -772,6 +772,7 @@
             max-width: 1600px;
             margin: 0 auto 0.9rem auto;
             overflow-x: auto;
+            overflow-y: visible;
             scrollbar-width: thin;
         }
         .top-bar-group {
@@ -1032,15 +1033,13 @@
             flex-shrink: 0;
         }
         .profile-dropdown {
-            position: absolute;
-            right: 0;
-            top: calc(100% + 6px);
+            position: fixed;
             background: white;
             border: 1px solid #e2e8f0;
             border-radius: 6px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.1);
             min-width: 170px;
-            z-index: 2000;
+            z-index: 6000;
             overflow: hidden;
             display: none;
         }
@@ -1285,11 +1284,25 @@
             avatarCircle.textContent = (username || '?').charAt(0).toUpperCase();
         }
 
+        // Dropdown is position:fixed now (so it can't get clipped by the
+        // horizontally-scrolling top bar) — position it under the chip
+        // every time it's opened.
+        function positionProfileDropdown() {
+            const rect = profileChip.getBoundingClientRect();
+            profileDropdown.style.top = (rect.bottom + 6) + 'px';
+            profileDropdown.style.right = (window.innerWidth - rect.right) + 'px';
+        }
+
         profileChip.addEventListener('click', (e) => {
             e.stopPropagation();
+            const willShow = !profileDropdown.classList.contains('visible');
+            if (willShow) positionProfileDropdown();
             profileDropdown.classList.toggle('visible');
         });
         document.addEventListener('click', () => profileDropdown.classList.remove('visible'));
+        window.addEventListener('resize', () => {
+            if (profileDropdown.classList.contains('visible')) positionProfileDropdown();
+        });
 
         logoutBtn.addEventListener('click', async () => {
             try { await api('/api/logout', { method: 'POST' }); } catch (e) {}
@@ -1603,6 +1616,40 @@
             } catch {
                 return text;
             }
+        }
+
+        // Recursively hunt for any key containing "token" in a parsed JSON object
+        // and return its (string/number) value. Depth-first, first match wins.
+        function findTokenInObject(obj) {
+            if (obj === null || typeof obj !== 'object') return null;
+            for (const key of Object.keys(obj)) {
+                const val = obj[key];
+                if (/token/i.test(key) && (typeof val === 'string' || typeof val === 'number')) {
+                    return String(val);
+                }
+            }
+            for (const key of Object.keys(obj)) {
+                const val = obj[key];
+                if (val && typeof val === 'object') {
+                    const nested = findTokenInObject(val);
+                    if (nested) return nested;
+                }
+            }
+            return null;
+        }
+
+        // Extracts just the token value out of a response body — tries a proper
+        // JSON parse first, falls back to a regex scan of the raw text.
+        function extractToken(text) {
+            if (!text) return null;
+            try {
+                const obj = JSON.parse(text);
+                const found = findTokenInObject(obj);
+                if (found) return found;
+            } catch (e) {}
+            const match = text.match(/"[^"]*token[^"]*"\s*:\s*"([^"]+)"/i);
+            if (match) return match[1];
+            return null;
         }
 
         // Function to copy text to clipboard
@@ -1942,14 +1989,12 @@
                 html += `<div class="col-md-7">`;
                 html += `<div class="response-container">`;
                 
-                // Response Header
+                // Response Header — only Copy (copies just the token) and Send remain
                 html += `<div class="response-header">`;
                 html += `<span class="small fw-semibold"><i class="bi bi-code-square me-1"></i>Response</span>`;
                 html += `<div class="btn-group">`;
-                html += `<button class="btn btn-clear btn-sm" data-clear-response="${index}"><i class="bi bi-arrow-repeat"></i> Clear</button>`;
                 if (responseData) {
-                    html += `<button class="btn btn-copy btn-sm" data-copy-response="${index}"><i class="bi bi-clipboard"></i> Copy</button>`;
-                    html += `<button class="btn btn-format btn-sm" data-format-response="${index}"><i class="bi bi-braces"></i> Format</button>`;
+                    html += `<button class="btn btn-copy btn-sm" data-copy-response="${index}" title="Copy token"><i class="bi bi-key-fill"></i> Copy</button>`;
                 }
                 html += `<button class="btn btn-primary btn-send btn-sm" data-send="${index}"><i class="bi bi-send"></i> Send</button>`;
                 html += `</div>`;
@@ -2011,40 +2056,18 @@
                 });
             });
 
-            // Clear response button
-            document.querySelectorAll('[data-clear-response]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const index = parseInt(btn.dataset.clearResponse);
-                    clearResponse(index);
-                });
-            });
-
-            // Copy response button
+            // Copy response button — copies ONLY the token found in the response,
+            // not the whole response body.
             document.querySelectorAll('[data-copy-response]').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     const index = parseInt(btn.dataset.copyResponse);
                     const responseData = responseMap.get(customApis[index].id);
                     if (responseData) {
-                        await copyToClipboard(responseData.text, index);
-                    }
-                });
-            });
-
-            // Format response button
-            document.querySelectorAll('[data-format-response]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const index = parseInt(btn.dataset.formatResponse);
-                    const id = customApis[index].id;
-                    const responseData = responseMap.get(id);
-                    if (responseData) {
-                        const formatted = formatJson(responseData.text);
-                        if (formatted !== responseData.text) {
-                            responseData.text = formatted;
-                            responseData.formatted = true;
-                            responseMap.set(id, responseData);
-                            saveResponseRemote(id, responseData);
-                            renderCards();
-                            showToast('JSON formatted', 'success');
+                        const token = extractToken(responseData.text);
+                        if (token) {
+                            await copyToClipboard(token, index);
+                        } else {
+                            showToast('No token found in response', 'error');
                         }
                     }
                 });
