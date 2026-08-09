@@ -11,15 +11,15 @@
         :root {
             --nav-width: 260px;
             --bg-light: #f8fafd;
-            --bg-dark: #1a1e24;
+            --bg-dark: #131720;
             --card-light: #ffffff;
-            --card-dark: #2a2f38;
+            --card-dark: #1e2530;
             --text-light: #1e293b;
             --text-dark: #f1f5f9;
             --border-light: #e2e8f0;
-            --border-dark: #334155;
-            
-            /* Response status colors */
+            --border-dark: #2f3a4c;
+
+            /* Response status colors (light) */
             --success-bg: #dcfce7;
             --success-text: #166534;
             --warning-bg: #fef9c3;
@@ -28,7 +28,7 @@
             --error-text: #991b1b;
             --info-bg: #dbeafe;
             --info-text: #1e40af;
-            
+
             /* Group Colors */
             --line-login: #ef4444;
             --line-register: #10b981;
@@ -40,7 +40,7 @@
             --line-forget: #ec4899;
             --line-logout: #6b7280;
             --line-reset: #14b8a6;
-            
+
             /* Custom colors */
             --custom-1: #a855f7;
             --custom-2: #d946ef;
@@ -55,64 +55,176 @@
             transition: background-color 0.2s, color 0.2s;
             font-size: 0.9rem;
         }
+
+        /* ========================================================= */
+        /* DARK MODE — every surface in the app gets a dark styling  */
+        /* ========================================================= */
         body.dark-mode {
             background-color: var(--bg-dark);
             color: var(--text-dark);
         }
-        
-        /* Dark mode styles */
         body.dark-mode .api-nav {
-            background: #1e293b;
-            border-color: #334155;
+            background: var(--card-dark);
+            border-color: var(--border-dark);
         }
         body.dark-mode .nav-header {
             color: #94a3b8;
-            border-bottom-color: #334155;
+            border-bottom-color: var(--border-dark);
         }
-        body.dark-mode .nav-tree-group-header {
-            color: #e2e8f0;
+        body.dark-mode .nav-tree-group-header { color: #e2e8f0; }
+        body.dark-mode .nav-tree-group-header:hover { background: #2a3242; }
+        body.dark-mode .nav-tree-group-header.active-filter {
+            background: #2a3242;
         }
-        body.dark-mode .nav-tree-group-header:hover {
-            background: #2d3a4f;
-        }
-        body.dark-mode .nav-tree-item {
-            color: #cbd5e1;
-        }
-        body.dark-mode .nav-tree-item:hover {
-            background: #2d3a4f;
-        }
-        body.dark-mode .nav-tree-item.main {
-            background: #1e3a5f;
-        }
-        body.dark-mode .nav-tree-item.custom-group {
-            background: #3a1e4f;
+        body.dark-mode .nav-tree-item { color: #cbd5e1; }
+        body.dark-mode .nav-tree-item:hover { background: #2a3242; }
+        body.dark-mode .nav-tree-item.main { background: #1e3a5f; }
+        body.dark-mode .nav-tree-item.custom-group { background: #3a1e4f; }
+        body.dark-mode .nav-footer {
+            background: var(--card-dark);
+            border-top-color: var(--border-dark);
         }
         body.dark-mode .api-row {
-            background: #1e293b;
-            border-color: #334155;
+            background: var(--card-dark);
+            border-color: var(--border-dark);
         }
-        body.dark-mode .response-header {
-            background: #0f172a;
-            border-bottom-color: #334155;
+        body.dark-mode .response-header,
+        body.dark-mode .request-header {
+            background: #171d29;
+            border-bottom-color: var(--border-dark);
         }
         body.dark-mode .response-metrics {
-            background: #1e293b;
+            background: #171d29;
         }
         body.dark-mode .metric-item {
-            background: #0f172a;
+            background: #232b3a;
+            color: #cbd5e1;
         }
-        body.dark-mode .request-header {
-            background: #0f172a;
-            border-bottom-color: #334155;
+        body.dark-mode .request-container,
+        body.dark-mode .response-container {
+            border-color: var(--border-dark);
         }
-        
+        body.dark-mode .request-textarea {
+            background: #171d29;
+            color: #e2e8f0;
+        }
+        body.dark-mode .request-textarea:focus {
+            background: #1e2530;
+        }
+        body.dark-mode .request-textarea::placeholder { color: #64748b; }
+        body.dark-mode .url-box {
+            background: #171d29;
+            border-color: var(--border-dark);
+            color: #e2e8f0;
+        }
+        body.dark-mode .method-select {
+            background: #171d29;
+            border-color: var(--border-dark);
+            color: #e2e8f0;
+        }
+        body.dark-mode .auth-panel {
+            background: #171d29;
+            border-color: var(--border-dark);
+        }
+        body.dark-mode .auth-panel .form-select,
+        body.dark-mode .auth-panel .form-control {
+            background: #232b3a;
+            border-color: var(--border-dark);
+            color: #e2e8f0;
+        }
+        body.dark-mode .response-pre {
+            background: #0a0d13;
+            color: #dbe4f3;
+            border-top-color: var(--border-dark);
+        }
+        body.dark-mode .btn-clear,
+        body.dark-mode .btn-copy,
+        body.dark-mode .btn-format,
+        body.dark-mode .btn-clear-request {
+            background: #232b3a;
+            color: #cbd5e1;
+            border-color: var(--border-dark);
+        }
+        body.dark-mode .btn-clear:hover,
+        body.dark-mode .btn-copy:hover,
+        body.dark-mode .btn-format:hover {
+            background: #2f3a4c;
+        }
+        body.dark-mode .btn-clear-request:hover {
+            background: #4a1f24;
+            color: #fca5a5;
+            border-color: #7f1d1d;
+        }
+        body.dark-mode .global-base {
+            background: #232b3a;
+            border-color: var(--border-dark);
+            color: #e2e8f0;
+        }
+        body.dark-mode .port-input {
+            background: #232b3a;
+            border-color: var(--border-dark);
+            color: #e2e8f0;
+        }
+        body.dark-mode .theme-toggle {
+            background: #232b3a;
+            border-color: var(--border-dark);
+            color: #e2e8f0;
+        }
+        body.dark-mode .group-badge {
+            background: #232b3a;
+            color: #cbd5e1;
+        }
+        body.dark-mode .group-badge.custom {
+            background: #3a1e4f;
+            color: #d8b4fe;
+        }
+        body.dark-mode .locked-badge {
+            background: #384154;
+        }
+        body.dark-mode .lock-icon { color: #94a3b8; }
+        body.dark-mode .method-post { background: #1e3a5f; color: #93c5fd; }
+        body.dark-mode .method-get { background: #14532d; color: #86efac; }
+        body.dark-mode .method-put { background: #92400e; color: #fde68a; }
+        body.dark-mode .method-delete { background: #7f1d1d; color: #fca5a5; }
+        body.dark-mode .status-success { background: #14532d; color: #86efac; }
+        body.dark-mode .status-warning { background: #78350f; color: #fde68a; }
+        body.dark-mode .status-error { background: #7f1d1d; color: #fca5a5; }
+        body.dark-mode .action-btn {
+            color: #cbd5e1;
+            border-color: var(--border-dark) !important;
+        }
+        body.dark-mode .action-btn.btn-outline-secondary {
+            color: #cbd5e1;
+            border-color: var(--border-dark);
+        }
+        body.dark-mode .action-btn.btn-outline-primary {
+            color: #93c5fd;
+            border-color: #3b5a85;
+        }
+        body.dark-mode .action-btn.btn-outline-danger {
+            color: #fca5a5;
+            border-color: #7f1d1d;
+        }
+        body.dark-mode .filter-banner {
+            background: #2a2140;
+            color: #d8b4fe;
+            border-color: #4c3575;
+        }
+        body.dark-mode .filter-banner .clear-filter-btn {
+            background: #232b3a;
+            border-color: var(--border-dark);
+            color: #e2e8f0;
+        }
+        body.dark-mode ::-webkit-scrollbar-track { background: #171d29; }
+        body.dark-mode ::-webkit-scrollbar-thumb { background: #384154; }
+
         .app-layout {
             display: flex;
             gap: 1rem;
             max-width: 1600px;
             margin: 0 auto;
         }
-        
+
         /* Navigation */
         .api-nav {
             width: var(--nav-width);
@@ -129,7 +241,7 @@
             flex-direction: column;
             overflow: hidden;
         }
-        
+
         .nav-header {
             font-size: 0.7rem;
             font-weight: 600;
@@ -139,25 +251,21 @@
             border-bottom: 1px solid #e2e8f0;
             flex-shrink: 0;
         }
-        
+
         .nav-content {
             flex: 1;
             overflow-y: auto;
             padding: 0.4rem 0.4rem 0.4rem 0.4rem;
             max-height: calc(100vh - 12rem);
         }
-        
+
         .nav-footer {
             padding: 0.8rem 0.6rem;
             border-top: 1px solid #e2e8f0;
             background: white;
             flex-shrink: 0;
         }
-        body.dark-mode .nav-footer {
-            background: #1e293b;
-            border-top-color: #334155;
-        }
-        
+
         .add-button {
             display: flex;
             align-items: center;
@@ -176,7 +284,7 @@
         .add-button:hover {
             background: linear-gradient(135deg, #9333ea 0%, #a855f7 100%);
         }
-        
+
         /* Tree Navigation */
         .nav-tree-group {
             margin: 0.4rem 0;
@@ -199,6 +307,7 @@
             margin-left: auto;
             transition: transform 0.2s;
             font-size: 0.7rem;
+            padding: 2px 6px;
         }
         .nav-tree-group-header.collapsed .group-toggle {
             transform: rotate(-90deg);
@@ -206,14 +315,18 @@
         .nav-tree-group-header:hover {
             background: #f1f5f9;
         }
-        
+        .nav-tree-group-header.active-filter {
+            background: #f3e8ff;
+            box-shadow: inset 3px 0 0 0 var(--grp-color, #a855f7);
+        }
+
         .nav-tree-items {
             margin-left: 1.2rem;
         }
         .nav-tree-items.collapsed {
             display: none;
         }
-        
+
         .nav-tree-item {
             display: flex;
             align-items: center;
@@ -250,6 +363,9 @@
         .nav-tree-item.custom-group {
             background: #f3e8ff;
         }
+        .nav-tree-item.active-filter {
+            box-shadow: inset 0 0 0 1.5px var(--grp-color, #a855f7);
+        }
         .main-badge {
             background: #3b82f6;
             color: white;
@@ -274,7 +390,7 @@
             font-size: 0.6rem;
             margin-left: 5px;
         }
-        
+
         /* Content Area */
         .content-area {
             flex-grow: 1;
@@ -284,7 +400,35 @@
             padding-right: 5px;
             scroll-behavior: smooth;
         }
-        
+
+        /* Filter banner - shows which group the right pane is locked to */
+        .filter-banner {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: #f3e8ff;
+            color: #7e22ce;
+            border: 1px solid #e9d5ff;
+            border-radius: 30px;
+            padding: 6px 8px 6px 16px;
+            margin-bottom: 0.9rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .filter-banner.visible { display: flex; }
+        .filter-banner .clear-filter-btn {
+            margin-left: auto;
+            background: white;
+            border: 1px solid #e9d5ff;
+            border-radius: 30px;
+            padding: 3px 14px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            color: #7e22ce;
+            font-weight: 600;
+        }
+        .filter-banner .clear-filter-btn:hover { background: #faf5ff; }
+
         .api-row {
             background: white;
             border-radius: 20px;
@@ -304,12 +448,22 @@
             box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.3);
             transform: scale(1.01);
         }
-        
+
         /* Dynamic border colors */
+        .api-row[data-group="login"] { border-left-color: var(--line-login); }
+        .api-row[data-group="register"] { border-left-color: var(--line-register); }
+        .api-row[data-group="otp"] { border-left-color: var(--line-otp); }
+        .api-row[data-group="verify"] { border-left-color: var(--line-verify); }
+        .api-row[data-group="profile"] { border-left-color: var(--line-profile); }
+        .api-row[data-group="update"] { border-left-color: var(--line-update); }
+        .api-row[data-group="refresh"] { border-left-color: var(--line-refresh); }
+        .api-row[data-group="forget"] { border-left-color: var(--line-forget); }
+        .api-row[data-group="logout"] { border-left-color: var(--line-logout); }
+        .api-row[data-group="reset"] { border-left-color: var(--line-reset); }
         .api-row[data-group^="custom-"] {
             border-left-color: var(--custom-color);
         }
-        
+
         .method-badge {
             font-size: 0.7rem;
             font-weight: 600;
@@ -323,7 +477,7 @@
         .method-get { background: #e6f7e6; color: #166534; }
         .method-put { background: #fef3c7; color: #92400e; }
         .method-delete { background: #fee2e2; color: #991b1b; }
-        
+
         .url-box {
             background: #f8fafc;
             padding: 6px 14px;
@@ -333,14 +487,14 @@
             font-size: 0.8rem;
             width: 100%;
         }
-        
+
         .method-select {
             font-size: 0.8rem;
             padding: 4px 20px 4px 12px;
             border-radius: 30px;
             border: 1px solid #e2e8f0;
         }
-        
+
         .auth-panel {
             background: #f8fafc;
             border-radius: 16px;
@@ -349,7 +503,7 @@
             border: 1px solid #e2e8f0;
             font-size: 0.8rem;
         }
-        
+
         /* Request Section New Styles */
         .request-container {
             border-radius: 16px;
@@ -357,7 +511,7 @@
             border: 1px solid #e2e8f0;
             height: 100%;
         }
-        
+
         .request-header {
             background: #f8fafc;
             padding: 0.5rem 1rem;
@@ -366,7 +520,7 @@
             align-items: center;
             justify-content: space-between;
         }
-        
+
         .request-textarea {
             background: #f8fafc;
             padding: 10px;
@@ -384,13 +538,13 @@
             outline: none;
             background: #ffffff;
         }
-        
+
         .response-container {
             border-radius: 16px;
             overflow: hidden;
             border: 1px solid #e2e8f0;
         }
-        
+
         .response-header {
             background: #f8fafc;
             padding: 0.5rem 1rem;
@@ -399,7 +553,7 @@
             align-items: center;
             justify-content: space-between;
         }
-        
+
         .response-metrics {
             display: flex;
             gap: 1rem;
@@ -407,7 +561,7 @@
             background: #f1f5f9;
             flex-wrap: wrap;
         }
-        
+
         .metric-item {
             display: flex;
             align-items: center;
@@ -418,33 +572,33 @@
             font-size: 0.75rem;
             font-weight: 500;
         }
-        
+
         .metric-item i {
             font-size: 0.9rem;
         }
-        
+
         .status-badge {
             padding: 0.3rem 1rem;
             border-radius: 30px;
             font-weight: 600;
             font-size: 0.75rem;
         }
-        
+
         .status-success {
             background: var(--success-bg);
             color: var(--success-text);
         }
-        
+
         .status-warning {
             background: var(--warning-bg);
             color: var(--warning-text);
         }
-        
+
         .status-error {
             background: var(--error-bg);
             color: var(--error-text);
         }
-        
+
         .response-pre {
             background: #0f172a;
             color: #e2e8f0;
@@ -458,7 +612,7 @@
             margin: 0;
             border-top: 1px solid #334155;
         }
-        
+
         .btn-send {
             border-radius: 30px;
             padding: 5px 20px;
@@ -470,7 +624,7 @@
         .btn-send:hover {
             background: #2563eb;
         }
-        
+
         .btn-clear {
             border-radius: 30px;
             padding: 5px 15px;
@@ -483,7 +637,7 @@
         .btn-clear:hover {
             background: #e2e8f0;
         }
-        
+
         .btn-copy {
             border-radius: 30px;
             padding: 5px 15px;
@@ -496,7 +650,7 @@
         .btn-copy:hover {
             background: #e2e8f0;
         }
-        
+
         .btn-format {
             border-radius: 30px;
             padding: 5px 15px;
@@ -509,7 +663,7 @@
         .btn-format:hover {
             background: #e2e8f0;
         }
-        
+
         .btn-clear-request {
             border-radius: 30px;
             padding: 2px 10px;
@@ -524,14 +678,14 @@
             color: #991b1b;
             border-color: #fecaca;
         }
-        
+
         .action-btn {
             border-radius: 30px;
             padding: 4px 10px;
             margin-left: 4px;
             font-size: 0.7rem;
         }
-        
+
         .group-badge {
             font-size: 0.6rem;
             padding: 2px 8px;
@@ -539,12 +693,12 @@
             background: #e2e8f0;
             margin-left: 8px;
         }
-        
+
         .group-badge.custom {
             background: #f3e8ff;
             color: #a855f7;
         }
-        
+
         /* Top bar */
         .global-base {
             background: #f1f5f9;
@@ -554,7 +708,7 @@
             font-size: 0.8rem;
             border: 1px solid #e2e8f0;
         }
-        
+
         .port-input {
             max-width: 100px;
             border-radius: 30px;
@@ -562,7 +716,7 @@
             padding: 5px 12px;
             font-size: 0.8rem;
         }
-        
+
         .theme-toggle {
             border-radius: 30px;
             padding: 5px 15px;
@@ -571,13 +725,13 @@
             font-size: 0.8rem;
             cursor: pointer;
         }
-        
+
         .custom-counter {
             font-size: 0.7rem;
             color: #a855f7;
             margin-left: 4px;
         }
-        
+
         .clear-all-btn {
             background: #ef4444;
             color: white;
@@ -590,7 +744,7 @@
         .clear-all-btn:hover {
             background: #dc2626;
         }
-        
+
         .clear-all-requests-btn {
             background: #f59e0b;
             color: white;
@@ -603,7 +757,7 @@
         .clear-all-requests-btn:hover {
             background: #d97706;
         }
-        
+
         /* Scroll to top button */
         .scroll-top {
             position: fixed;
@@ -629,7 +783,7 @@
         .scroll-top:hover {
             background: #9333ea;
         }
-        
+
         /* Toast message */
         .toast-message {
             position: fixed;
@@ -644,7 +798,7 @@
             z-index: 9999;
             animation: slideIn 0.3s ease;
         }
-        
+
         @keyframes slideIn {
             from {
                 transform: translateX(100%);
@@ -724,6 +878,11 @@
 
     <!-- Content Area - Scrollable -->
     <div class="content-area" id="contentArea">
+        <div class="filter-banner" id="filterBanner">
+            <i class="bi bi-funnel-fill"></i>
+            <span id="filterBannerText">Showing group</span>
+            <button class="clear-filter-btn" id="clearFilterBtn">Show All</button>
+        </div>
         <div id="apiCardsContainer"></div>
     </div>
 </div>
@@ -770,6 +929,7 @@
         let groupCollapsed = {};
         let customCounter = 0;
         let currentHighlight = null;
+        let activeFilterGroup = null; // null = show every group in the right pane
 
         // Count custom endpoints
         customApis.forEach(api => {
@@ -789,6 +949,9 @@
         const scrollTopBtn = document.getElementById('scrollTopBtn');
         const clearAllResponsesBtn = document.getElementById('clearAllResponsesBtn');
         const clearAllRequestsBtn = document.getElementById('clearAllRequestsBtn');
+        const filterBanner = document.getElementById('filterBanner');
+        const filterBannerText = document.getElementById('filterBannerText');
+        const clearFilterBtn = document.getElementById('clearFilterBtn');
 
         // Toast notification function
         function showToast(message, type = 'success') {
@@ -822,6 +985,8 @@
             themeIcon.classList.toggle('bi-moon-stars-fill');
         });
 
+        clearFilterBtn.addEventListener('click', () => setFilter(null));
+
         function buildBaseUrl() {
             let port = portInput.value.trim();
             return `http://localhost:${port || 5000}`;
@@ -839,7 +1004,15 @@
             renderCards();
         }
 
-        // Scroll to card function
+        // Filters the right-hand pane down to a single group ("null" clears it)
+        function setFilter(group) {
+            activeFilterGroup = group;
+            renderNav();
+            renderCards();
+            contentArea.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Scroll to card function (assumes the card is currently visible)
         function scrollToCard(index) {
             const card = document.getElementById(`card-${index}`);
             if (card) {
@@ -860,6 +1033,17 @@
                     currentHighlight = null;
                 }, 2000);
             }
+        }
+
+        // Filters to the clicked item's group, then scrolls to that specific card
+        function focusItem(index) {
+            const api = customApis[index];
+            if (!api) return;
+            const needsRender = activeFilterGroup !== api.group;
+            activeFilterGroup = api.group;
+            renderNav();
+            renderCards();
+            setTimeout(() => scrollToCard(index), needsRender ? 60 : 0);
         }
 
         // Function to clear request data for a specific card
@@ -934,6 +1118,11 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
+        function groupColorVar(group, api) {
+            if (group.startsWith('custom-')) return (api && api.customColor) || '#a855f7';
+            return `var(--line-${group})`;
+        }
+
         function addCustomEndpoint() {
             const name = prompt('Enter custom endpoint name:', 'My API');
             if (!name) return;
@@ -961,6 +1150,7 @@
             
             customApis.push(newApi);
             saveApis(customApis);
+            activeFilterGroup = groupName;
             renderNav();
             renderCards();
             updateCustomCount();
@@ -993,14 +1183,12 @@
                 const copies = apis.filter(a => !a.isMain);
                 const collapsed = groupCollapsed[group] ? 'collapsed' : '';
                 const isCustom = group.startsWith('custom-');
+                const isActiveGroup = activeFilterGroup === group;
                 
-                let groupColor = `var(--line-${group})`;
-                if (isCustom && mainApi && mainApi.customColor) {
-                    groupColor = mainApi.customColor;
-                }
+                let groupColor = groupColorVar(group, mainApi);
                 
                 navHtml += `<div class="nav-tree-group">`;
-                navHtml += `<div class="nav-tree-group-header ${collapsed}" data-group="${group}" style="border-left-color: ${groupColor};">`;
+                navHtml += `<div class="nav-tree-group-header ${collapsed} ${isActiveGroup ? 'active-filter' : ''}" data-group="${group}" style="--grp-color: ${groupColor}; border-left-color: ${groupColor};">`;
                 navHtml += `<i class="bi bi-circle-fill" style="color: ${groupColor}; font-size: 0.5rem;"></i>`;
                 
                 if (isCustom) {
@@ -1010,13 +1198,13 @@
                 }
                 
                 navHtml += `<span class="badge bg-secondary ms-1" style="font-size: 0.6rem;">${apis.length}</span>`;
-                navHtml += `<i class="bi bi-chevron-down group-toggle"></i>`;
+                navHtml += `<i class="bi bi-chevron-down group-toggle" data-toggle-group="${group}"></i>`;
                 navHtml += `</div>`;
                 
                 navHtml += `<div class="nav-tree-items ${collapsed}" data-group-items="${group}">`;
                 
-                // Main/Custom API - Click to scroll
-                navHtml += `<div class="nav-tree-item ${isCustom ? 'custom-group' : 'main'} ${mainApi.hidden ? 'hidden' : ''}" data-nav-index="${mainApi.idx}">`;
+                // Main/Custom API - click filters the right pane to this group
+                navHtml += `<div class="nav-tree-item ${isCustom ? 'custom-group' : 'main'} ${mainApi.hidden ? 'hidden' : ''} ${isActiveGroup ? 'active-filter' : ''}" data-nav-index="${mainApi.idx}" style="--grp-color: ${groupColor};">`;
                 navHtml += `<span class="tree-line"></span>`;
                 navHtml += `<i class="bi bi-eye${mainApi.hidden ? '-slash' : ''} eye-icon" data-eye-index="${mainApi.idx}"></i>`;
                 navHtml += `<span class="item-name">${mainApi.name}</span>`;
@@ -1030,9 +1218,9 @@
                 }
                 navHtml += `</div>`;
                 
-                // Copies - Click to scroll
+                // Copies - click filters + scrolls too
                 copies.forEach(copy => {
-                    navHtml += `<div class="nav-tree-item ${copy.hidden ? 'hidden' : ''}" data-nav-index="${copy.idx}">`;
+                    navHtml += `<div class="nav-tree-item ${copy.hidden ? 'hidden' : ''} ${isActiveGroup ? 'active-filter' : ''}" data-nav-index="${copy.idx}" style="--grp-color: ${groupColor};">`;
                     navHtml += `<span class="tree-line"></span>`;
                     navHtml += `<i class="bi bi-eye${copy.hidden ? '-slash' : ''} eye-icon" data-eye-index="${copy.idx}"></i>`;
                     navHtml += `<span class="item-name">${copy.name}</span>`;
@@ -1044,11 +1232,21 @@
 
             navContainer.innerHTML = navHtml;
 
-            // Group toggle
+            // Clicking the group header (not the chevron) filters the right pane to just that group
             document.querySelectorAll('[data-group]').forEach(header => {
                 header.addEventListener('click', (e) => {
                     if (e.target.classList.contains('eye-icon')) return;
-                    const group = header.dataset.group;
+                    if (e.target.hasAttribute('data-toggle-group')) return;
+                    setFilter(header.dataset.group);
+                });
+            });
+
+            // Chevron only expands/collapses the tree list — it never touches the filter
+            document.querySelectorAll('[data-toggle-group]').forEach(chevron => {
+                chevron.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const group = chevron.dataset.toggleGroup;
+                    const header = document.querySelector(`.nav-tree-group-header[data-group="${group}"]`);
                     const items = document.querySelector(`[data-group-items="${group}"]`);
                     header.classList.toggle('collapsed');
                     items.classList.toggle('collapsed');
@@ -1064,12 +1262,13 @@
                 });
             });
 
-            // NAVIGATION ITEM CLICK - Scroll to card
+            // NAVIGATION ITEM CLICK — filter to its group + scroll to it
             document.querySelectorAll('.nav-tree-item[data-nav-index]').forEach(item => {
                 item.addEventListener('click', (e) => {
                     if (e.target.classList.contains('eye-icon')) return;
+                    e.stopPropagation();
                     const index = parseInt(item.dataset.navIndex);
-                    scrollToCard(index);
+                    focusItem(index);
                 });
             });
         }
@@ -1113,15 +1312,27 @@
 
         function renderCards() {
             let html = '';
+
+            // Update the filter banner
+            if (activeFilterGroup) {
+                const isCustom = activeFilterGroup.startsWith('custom-');
+                const mainApi = customApis.find(a => a.group === activeFilterGroup && a.isMain);
+                const label = isCustom && mainApi ? mainApi.name : activeFilterGroup;
+                filterBannerText.textContent = `Showing only: ${label}`;
+                filterBanner.classList.add('visible');
+            } else {
+                filterBanner.classList.remove('visible');
+            }
             
             customApis.forEach((api, index) => {
                 if (api.hidden) return;
+                if (activeFilterGroup && api.group !== activeFilterGroup) return;
                 
                 const fullUrl = api.fullUrl || buildBaseUrl() + api.path;
                 const responseData = responseMap.get(index);
                 const isCustom = api.group.startsWith('custom-');
                 
-                const customStyle = isCustom && api.customColor ? `style="border-left-color: ${api.customColor};"` : '';
+                const customStyle = isCustom && api.customColor ? `style="border-left-color: ${api.customColor}; --custom-color: ${api.customColor};"` : '';
                 
                 html += `<div class="api-row" id="card-${index}" data-group="${api.group}" ${customStyle}>`;
                 
