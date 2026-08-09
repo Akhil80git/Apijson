@@ -763,64 +763,103 @@
         }
 
         /* Top bar */
+        .top-bar {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.4rem;
+            max-width: 1600px;
+            margin: 0 auto 0.9rem auto;
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+        .top-bar-group {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex-shrink: 0;
+        }
+
         .global-base {
             background: #f1f5f9;
             border-radius: 4px;
-            padding: 5px 15px;
+            padding: 5px 10px;
             font-weight: 500;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             border: 1px solid #e2e8f0;
+            white-space: nowrap;
         }
 
         .port-input {
-            max-width: 100px;
+            width: 68px;
+            min-width: 68px;
             border-radius: 4px;
             border: 1px solid #e2e8f0;
-            padding: 5px 12px;
-            font-size: 0.8rem;
+            padding: 5px 8px;
+            font-size: 0.75rem;
         }
 
         .theme-toggle {
             border-radius: 4px;
-            padding: 5px 15px;
+            padding: 5px 10px;
             background: white;
             border: 1px solid #e2e8f0;
             font-size: 0.8rem;
             cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            border-radius: 4px;
+            padding: 5px 9px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+        .icon-btn span.btn-label {
+            display: inline;
+        }
+        body.dark-mode .icon-btn {
+            background: #232b3a;
+            color: #cbd5e1;
+            border-color: var(--border-dark);
+        }
+        body.dark-mode .top-bar .global-base {
+            background: #232b3a;
+            border-color: var(--border-dark);
+            color: #e2e8f0;
+        }
+        body.dark-mode .top-bar .port-input {
+            background: #232b3a;
+            border-color: var(--border-dark);
+            color: #e2e8f0;
+        }
+        body.dark-mode .top-bar .theme-toggle {
+            background: #232b3a;
+            border-color: var(--border-dark);
+            color: #e2e8f0;
+        }
+
+        /* Below ~640px, drop the text labels on the utility buttons and keep icons only,
+           so the whole bar still fits on a single row on small screens. */
+        @media (max-width: 640px) {
+            .icon-btn span.btn-label { display: none; }
+            .global-base span.btn-label { display: none; }
+            .port-input { width: 54px; min-width: 54px; }
         }
 
         .custom-counter {
             font-size: 0.7rem;
             color: #a855f7;
             margin-left: 4px;
-        }
-
-        .clear-all-btn {
-            background: #f1f5f9;
-            color: #475569;
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
-            padding: 0.2rem 1rem;
-            font-size: 0.7rem;
-            margin-left: 0.5rem;
-        }
-        .clear-all-btn:hover {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .clear-all-requests-btn {
-            background: #f1f5f9;
-            color: #475569;
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
-            padding: 0.2rem 1rem;
-            font-size: 0.7rem;
-            margin-left: 0.5rem;
-        }
-        .clear-all-requests-btn:hover {
-            background: #fef3c7;
-            color: #92400e;
         }
 
         /* Scroll to top button */
@@ -881,9 +920,182 @@
             font-size: 0.8rem;
             margin-left: 4px;
         }
+
+        /* ================= AUTH OVERLAY ================= */
+        .auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5000;
+        }
+        .auth-overlay.d-none { display: none; }
+        .auth-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 340px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+        }
+        body.dark-mode .auth-card {
+            background: var(--card-dark);
+            color: var(--text-dark);
+        }
+        .auth-card h5 {
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+        .auth-card .auth-sub {
+            font-size: 0.78rem;
+            color: #64748b;
+            margin-bottom: 1.2rem;
+        }
+        .auth-card .form-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #475569;
+        }
+        body.dark-mode .auth-card .form-label { color: #cbd5e1; }
+        .auth-card .form-control {
+            font-size: 0.85rem;
+        }
+        body.dark-mode .auth-card .form-control {
+            background: #171d29;
+            border-color: var(--border-dark);
+            color: #e2e8f0;
+        }
+        .auth-error {
+            font-size: 0.75rem;
+            color: #991b1b;
+            background: #fee2e2;
+            border-radius: 4px;
+            padding: 6px 10px;
+            margin-top: 0.6rem;
+            display: none;
+        }
+        .auth-error.visible { display: block; }
+        .auth-submit-btn {
+            width: 100%;
+            margin-top: 1rem;
+            border-radius: 6px;
+            padding: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            background: #a855f7;
+            border: none;
+            color: white;
+        }
+        .auth-submit-btn:hover { background: #9333ea; }
+        .auth-submit-btn:disabled { opacity: 0.6; }
+        .auth-hint {
+            font-size: 0.68rem;
+            color: #94a3b8;
+            margin-top: 0.8rem;
+            text-align: center;
+        }
+
+        /* ================= PROFILE CHIP ================= */
+        .profile-chip-wrap { position: relative; flex-shrink: 0; }
+        .profile-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        body.dark-mode .profile-chip {
+            background: #232b3a;
+            border-color: var(--border-dark);
+            color: #e2e8f0;
+        }
+        .profile-chip .avatar-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #a855f7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .profile-dropdown {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 6px);
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            min-width: 170px;
+            z-index: 2000;
+            overflow: hidden;
+            display: none;
+        }
+        .profile-dropdown.visible { display: block; }
+        body.dark-mode .profile-dropdown {
+            background: var(--card-dark);
+            border-color: var(--border-dark);
+        }
+        .profile-dropdown .pd-username {
+            padding: 10px 14px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        body.dark-mode .profile-dropdown .pd-username {
+            border-bottom-color: var(--border-dark);
+        }
+        .profile-dropdown .pd-logout {
+            padding: 10px 14px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #991b1b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .profile-dropdown .pd-logout:hover {
+            background: #fee2e2;
+        }
+        body.dark-mode .profile-dropdown .pd-logout:hover {
+            background: #4a1f24;
+        }
     </style>
 </head>
 <body class="p-3">
+
+<!-- ================= AUTH OVERLAY ================= -->
+<div class="auth-overlay" id="authOverlay">
+    <div class="auth-card">
+        <h5 id="authTitle">Welcome</h5>
+        <div class="auth-sub" id="authSub">Enter a username &amp; password to continue. New username? We'll create your account automatically.</div>
+        <div>
+            <label class="form-label">Username</label>
+            <input type="text" class="form-control" id="authUsername" placeholder="e.g. rahul123" autocomplete="username">
+        </div>
+        <div class="mt-2">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" id="authPassword" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <div class="auth-error" id="authError"></div>
+        <button class="auth-submit-btn" id="authSubmitBtn">Continue</button>
+        <div class="auth-hint">Same username + password logs you back in. Wrong password too many times (5+) from this device suspends the account.</div>
+    </div>
+</div>
 
 <!-- Scroll to top button -->
 <button class="scroll-top" id="scrollTopBtn" title="Scroll to top">
@@ -891,31 +1103,35 @@
 </button>
 
 <!-- Top Bar -->
-<div class="d-flex flex-wrap align-items-center justify-content-between mb-3" style="max-width: 1600px; margin: 0 auto;">
-    <div class="d-flex gap-2 align-items-center flex-wrap">
-        <span class="bg-white shadow-sm rounded-4 p-2 d-inline-flex align-items-center px-3">
-            <i class="bi bi-diagram-3 text-primary me-2" style="font-size: 1.2rem;"></i>
-            <span class="fw-bold" style="font-size: 1rem;">API Tree Pro</span>
-            <span class="badge bg-dark text-white ms-2 px-2" style="font-size: 0.6rem;">request/response analyzer</span>
-        </span>
-        <div class="d-flex gap-1">
-            <button class="clear-all-btn" id="clearAllResponsesBtn">
-                <i class="bi bi-eraser"></i> Clear All Responses
-            </button>
-            <button class="clear-all-requests-btn" id="clearAllRequestsBtn">
-                <i class="bi bi-input-cursor"></i> Clear All Request Data
-            </button>
-        </div>
+<div class="top-bar">
+    <div class="top-bar-group">
+        <button class="icon-btn" id="clearAllResponsesBtn" title="Clear All Responses">
+            <i class="bi bi-eraser"></i><span class="btn-label">Clear Resp</span>
+        </button>
+        <button class="icon-btn" id="clearAllRequestsBtn" title="Clear All Request Data">
+            <i class="bi bi-input-cursor"></i><span class="btn-label">Clear Req</span>
+        </button>
     </div>
-    <div class="d-flex align-items-center gap-2">
-        <div class="global-base d-flex align-items-center gap-1">
+    <div class="top-bar-group">
+        <div class="global-base d-flex align-items-center gap-1" title="localhost">
             <i class="bi bi-hdd-network-fill" style="font-size: 0.8rem;"></i>
-            <span>localhost</span>
+            <span class="btn-label">localhost</span>
         </div>
-        <input type="number" id="portInput" class="form-control port-input" value="5000">
-        <button class="theme-toggle" id="themeToggleBtn">
+        <input type="number" id="portInput" class="form-control port-input" value="5000" title="Port">
+        <button class="theme-toggle" id="themeToggleBtn" title="Toggle theme">
             <i class="bi bi-sun-fill" id="themeIcon"></i>
         </button>
+        <div class="profile-chip-wrap">
+            <div class="profile-chip" id="profileChip">
+                <span class="avatar-circle" id="avatarCircle">?</span>
+                <span class="btn-label" id="profileUsername">...</span>
+                <i class="bi bi-chevron-down" style="font-size: 0.65rem;"></i>
+            </div>
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="pd-username" id="pdUsername"></div>
+                <div class="pd-logout" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -952,18 +1168,44 @@
     </div>
 </div>
 
+<script src="dns.js"></script>
 <script>
     (function() {
-        // ===== IMPORTANT: Clear old localStorage data =====
-        // This will remove any old saved data that might be causing issues
-        localStorage.removeItem('scrollData');
-        
-        // Default APIs (system endpoints - locked)
+        // ================= BACKEND CONFIG =================
+        // APP_BACKEND_URL comes from dns.js — never hardcode it here.
+        const BACKEND = (typeof APP_BACKEND_URL !== 'undefined' && APP_BACKEND_URL) ? APP_BACKEND_URL.replace(/\/$/, '') : '';
+
+        function getDeviceId() {
+            let id = localStorage.getItem('deviceId');
+            if (!id) {
+                id = 'dev_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+                localStorage.setItem('deviceId', id);
+            }
+            return id;
+        }
+        const deviceId = getDeviceId();
+
+        function getToken() { return localStorage.getItem('authToken'); }
+        function setToken(t) { localStorage.setItem('authToken', t); }
+        function clearToken() { localStorage.removeItem('authToken'); }
+        function setUsername(u) { localStorage.setItem('authUsername', u); }
+        function getUsername() { return localStorage.getItem('authUsername') || ''; }
+
+        async function api(path, options = {}) {
+            const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
+            const token = getToken();
+            if (token) headers['Authorization'] = 'Bearer ' + token;
+            const res = await fetch(BACKEND + path, Object.assign({}, options, { headers }));
+            let data = null;
+            try { data = await res.json(); } catch (e) {}
+            return { ok: res.ok, status: res.status, data };
+        }
+
+        // Default APIs (system endpoints - locked) — used only as a local fallback
+        // if the backend has nothing yet (should normally be seeded server-side).
         const DEFAULT_APIS = [
             { name: 'Login', method: 'POST', path: '/api/auth/login', description: 'auth', body: JSON.stringify({ email: 'user@ex.com', password: '123456' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'login', isMain: true, hidden: false, isSystem: true },
-            
             { name: 'Register', method: 'POST', path: '/api/auth/register', description: 'signup', body: JSON.stringify({ username: 'test', email: 'test@a.com', password: 'secret' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'register', isMain: true, hidden: false, isSystem: true },
-            
             { name: 'OTP', method: 'POST', path: '/api/auth/otp', description: 'request', body: JSON.stringify({ phone: '+919999999999' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'otp', isMain: true, hidden: false, isSystem: true },
             { name: 'Verify', method: 'POST', path: '/api/auth/verify', description: 'verify', body: JSON.stringify({ email: 'user@ex.com', otp: '123456' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'verify', isMain: true, hidden: false, isSystem: true },
             { name: 'Profile', method: 'GET', path: '/api/user/profile', description: 'get', body: '', auth: { type: 'bearer', token: '' }, contentType: 'application/json', showAuth: false, group: 'profile', isMain: true, hidden: false, isSystem: true },
@@ -978,28 +1220,12 @@
             '#a855f7', '#d946ef', '#c084fc', '#b380ff', '#a78bfa'
         ];
 
-        function loadApis() {
-            // Always use fresh DEFAULT_APIS to ensure system endpoints are properly marked
-            return JSON.parse(JSON.stringify(DEFAULT_APIS));
-        }
-
-        function saveApis(apis) {
-            localStorage.setItem('scrollData', JSON.stringify(apis));
-        }
-
-        let customApis = loadApis();
+        let customApis = [];
         let responseMap = new Map(); // { index: { text, status, time, size, headers, formatted } }
         let groupCollapsed = {};
         let customCounter = 0;
         let currentHighlight = null;
-        let activeFilterGroup = null; // null = show every group in the right pane
-
-        // Count custom endpoints
-        customApis.forEach(api => {
-            if (api.group && api.group.startsWith('custom-')) {
-                customCounter++;
-            }
-        });
+        let activeFilterGroup = null; // null = empty state in the right pane
 
         const navContainer = document.getElementById('navTreeContainer');
         const container = document.getElementById('apiCardsContainer');
@@ -1015,6 +1241,157 @@
         const filterBanner = document.getElementById('filterBanner');
         const filterBannerText = document.getElementById('filterBannerText');
         const clearFilterBtn = document.getElementById('clearFilterBtn');
+
+        // ================= AUTH UI =================
+        const authOverlay = document.getElementById('authOverlay');
+        const authUsername = document.getElementById('authUsername');
+        const authPassword = document.getElementById('authPassword');
+        const authError = document.getElementById('authError');
+        const authSubmitBtn = document.getElementById('authSubmitBtn');
+        const profileChip = document.getElementById('profileChip');
+        const profileDropdown = document.getElementById('profileDropdown');
+        const avatarCircle = document.getElementById('avatarCircle');
+        const profileUsernameEl = document.getElementById('profileUsername');
+        const pdUsername = document.getElementById('pdUsername');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        function showAuthOverlay() {
+            authOverlay.classList.remove('d-none');
+        }
+        function hideAuthOverlay() {
+            authOverlay.classList.add('d-none');
+            authError.classList.remove('visible');
+            authPassword.value = '';
+        }
+        function showAuthError(msg) {
+            authError.textContent = msg;
+            authError.classList.add('visible');
+        }
+
+        function applyProfileUI(username) {
+            profileUsernameEl.textContent = username;
+            pdUsername.textContent = username;
+            avatarCircle.textContent = (username || '?').charAt(0).toUpperCase();
+        }
+
+        profileChip.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('visible');
+        });
+        document.addEventListener('click', () => profileDropdown.classList.remove('visible'));
+
+        logoutBtn.addEventListener('click', async () => {
+            try { await api('/api/logout', { method: 'POST' }); } catch (e) {}
+            clearToken();
+            customApis = [];
+            responseMap = new Map();
+            activeFilterGroup = null;
+            profileDropdown.classList.remove('visible');
+            showAuthOverlay();
+        });
+
+        async function submitAuth() {
+            const username = authUsername.value.trim();
+            const password = authPassword.value;
+            if (!username || !password) {
+                showAuthError('Please enter both username and password.');
+                return;
+            }
+            authSubmitBtn.disabled = true;
+            authSubmitBtn.textContent = 'Please wait...';
+            authError.classList.remove('visible');
+            try {
+                const { ok, data } = await api('/api/auth', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password, deviceId })
+                });
+                if (!ok || !data || !data.token) {
+                    showAuthError((data && data.error) || 'Something went wrong. Try again.');
+                    return;
+                }
+                setToken(data.token);
+                setUsername(data.username);
+                applyProfileUI(data.username);
+                hideAuthOverlay();
+                await loadRemoteData();
+                showToast(data.isNewUser ? 'Account created — welcome!' : 'Welcome back!', 'success');
+            } catch (err) {
+                showAuthError('Could not reach the server. Check the backend URL in dns.js.');
+            } finally {
+                authSubmitBtn.disabled = false;
+                authSubmitBtn.textContent = 'Continue';
+            }
+        }
+        authSubmitBtn.addEventListener('click', submitAuth);
+        authPassword.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitAuth(); });
+        authUsername.addEventListener('keydown', (e) => { if (e.key === 'Enter') authPassword.focus(); });
+
+        // ================= REMOTE DATA (replaces localStorage persistence) =================
+        let saveTimer = null;
+        function scheduleSave() {
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(saveRemoteDataNow, 500);
+        }
+        async function saveRemoteDataNow() {
+            if (!getToken()) return;
+            const responsesObj = {};
+            responseMap.forEach((v, k) => { responsesObj[k] = v; });
+            try {
+                await api('/api/data', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        apis: customApis,
+                        responses: responsesObj,
+                        activeFilterGroup: activeFilterGroup,
+                        port: portInput.value,
+                        customCounter: customCounter,
+                        groupCollapsed: groupCollapsed,
+                        theme: document.body.classList.contains('dark-mode') ? 'dark' : 'light'
+                    })
+                });
+            } catch (e) {
+                console.error('Save failed', e);
+            }
+        }
+
+        async function loadRemoteData() {
+            const { ok, data } = await api('/api/data', { method: 'GET' });
+            if (!ok || !data) {
+                customApis = JSON.parse(JSON.stringify(DEFAULT_APIS));
+                responseMap = new Map();
+                activeFilterGroup = null;
+            } else {
+                customApis = (data.apis && data.apis.length) ? data.apis : JSON.parse(JSON.stringify(DEFAULT_APIS));
+                responseMap = new Map(Object.entries(data.responses || {}).map(([k, v]) => [parseInt(k), v]));
+                activeFilterGroup = data.activeFilterGroup || null;
+                if (data.port) portInput.value = data.port;
+                customCounter = data.customCounter || 0;
+                groupCollapsed = data.groupCollapsed || {};
+                if (data.theme === 'dark') {
+                    document.body.classList.add('dark-mode');
+                    themeIcon.classList.remove('bi-sun-fill');
+                    themeIcon.classList.add('bi-moon-stars-fill');
+                }
+            }
+            renderNav();
+            renderCards();
+            updateCustomCount();
+        }
+
+        async function initAuth() {
+            const token = getToken();
+            if (!token) { showAuthOverlay(); return; }
+            const { ok, data } = await api('/api/me', { method: 'GET' });
+            if (!ok || !data) {
+                clearToken();
+                showAuthOverlay();
+                return;
+            }
+            applyProfileUI(data.username);
+            setUsername(data.username);
+            hideAuthOverlay();
+            await loadRemoteData();
+        }
 
         // Toast notification function
         function showToast(message, type = 'success') {
@@ -1046,6 +1423,7 @@
             document.body.classList.toggle('dark-mode');
             themeIcon.classList.toggle('bi-sun-fill');
             themeIcon.classList.toggle('bi-moon-stars-fill');
+            scheduleSave();
         });
 
         clearFilterBtn.addEventListener('click', () => setFilter(null));
@@ -1062,14 +1440,21 @@
 
         function toggleHide(index) {
             customApis[index].hidden = !customApis[index].hidden;
-            saveApis(customApis);
+            scheduleSave();
             renderNav();
             renderCards();
         }
 
-        // Filters the right-hand pane down to a single group ("null" clears it, clicking the active group again also clears it)
+        // Filters the right-hand pane down to a single group. Only the explicit
+        // "Show All" button (or an internal reset like logout) clears it back to null —
+        // clicking on the group/item that is already active must NOT blank the pane.
         function setFilter(group) {
-            activeFilterGroup = (activeFilterGroup === group) ? null : group;
+            if (group === null) {
+                activeFilterGroup = null;
+            } else {
+                activeFilterGroup = group;
+            }
+            scheduleSave();
             renderNav();
             renderCards();
             contentArea.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1098,17 +1483,15 @@
             }
         }
 
-        // Filters to the clicked item's group, then scrolls to that specific card. Clicking the same one again clears back to the empty state.
+        // Filters to the clicked item's group, then scrolls to that specific card.
+        // Clicking the item that is already active just re-scrolls to it — it never
+        // clears the pane back to the empty state (that only happens via "Show All").
         function focusItem(index) {
             const api = customApis[index];
             if (!api) return;
-            if (activeFilterGroup === api.group) {
-                activeFilterGroup = null;
-                renderNav();
-                renderCards();
-                return;
-            }
+            const sameGroupAlreadyActive = activeFilterGroup === api.group;
             activeFilterGroup = api.group;
+            scheduleSave();
             renderNav();
             renderCards();
             setTimeout(() => scrollToCard(index), 60);
@@ -1117,7 +1500,7 @@
         // Function to clear request data for a specific card
         function clearRequestData(index) {
             customApis[index].body = '';
-            saveApis(customApis);
+            scheduleSave();
             renderCards();
             showToast('Request data cleared', 'info');
         }
@@ -1125,6 +1508,7 @@
         // Function to clear response for a specific card
         function clearResponse(index) {
             responseMap.delete(index);
+            scheduleSave();
             renderCards();
             showToast('Response cleared', 'info');
         }
@@ -1132,6 +1516,7 @@
         // Function to clear all responses
         function clearAllResponses() {
             responseMap.clear();
+            scheduleSave();
             renderCards();
             showToast('All responses cleared', 'success');
         }
@@ -1141,7 +1526,7 @@
             customApis.forEach(api => {
                 api.body = '';
             });
-            saveApis(customApis);
+            scheduleSave();
             renderCards();
             showToast('All request data cleared', 'success');
         }
@@ -1217,7 +1602,7 @@
             };
             
             customApis.push(newApi);
-            saveApis(customApis);
+            scheduleSave();
             activeFilterGroup = groupName;
             renderNav();
             renderCards();
@@ -1315,6 +1700,7 @@
                     header.classList.toggle('collapsed');
                     items.classList.toggle('collapsed');
                     groupCollapsed[group] = items.classList.contains('collapsed');
+                    scheduleSave();
                 });
             });
 
@@ -1361,7 +1747,10 @@
             }
             responseMap = newMap;
             
-            saveApis(customApis);
+            // Keep the same group filtered/selected so the right pane never blanks out —
+            // duplicating an endpoint should only add a card next to it, nothing else changes.
+            activeFilterGroup = original.group;
+            scheduleSave();
             renderNav();
             renderCards();
             
@@ -1370,7 +1759,7 @@
 
         function toggleAuth(index) {
             customApis[index].showAuth = !customApis[index].showAuth;
-            saveApis(customApis);
+            scheduleSave();
             renderCards();
         }
 
@@ -1536,7 +1925,7 @@
                     this.timeout = setTimeout(() => {
                         const index = parseInt(this.dataset.body);
                         customApis[index].body = this.value;
-                        saveApis(customApis);
+                        scheduleSave();
                     }, 300);
                 });
             });
@@ -1588,6 +1977,7 @@
                             responseData.text = formatted;
                             responseData.formatted = true;
                             responseMap.set(index, responseData);
+                            scheduleSave();
                             renderCards();
                             showToast('JSON formatted', 'success');
                         }
@@ -1607,6 +1997,7 @@
                     }
                     
                     if (confirm('Delete this endpoint?')) {
+                        const deletedGroup = api.group;
                         customApis.splice(index, 1);
                         const newMap = new Map();
                         for (let [k, v] of responseMap.entries()) {
@@ -1614,7 +2005,14 @@
                             else if (k > index) newMap.set(k-1, v);
                         }
                         responseMap = newMap;
-                        saveApis(customApis);
+
+                        // Keep viewing whatever remains of this group (if the group still
+                        // has endpoints left, e.g. the main one). Only fall back to the
+                        // empty state if that was genuinely the last endpoint in the group.
+                        const groupStillHasEntries = customApis.some(a => a.group === deletedGroup);
+                        activeFilterGroup = groupStillHasEntries ? deletedGroup : activeFilterGroup;
+
+                        scheduleSave();
                         updateCustomCount();
                         renderNav();
                         renderCards();
@@ -1627,7 +2025,7 @@
                 select.addEventListener('change', (e) => {
                     const index = parseInt(e.target.dataset.method);
                     customApis[index].method = e.target.value;
-                    saveApis(customApis);
+                    scheduleSave();
                 });
             });
 
@@ -1642,7 +2040,7 @@
                         customApis[index].path = val;
                         delete customApis[index].fullUrl;
                     }
-                    saveApis(customApis);
+                    scheduleSave();
                 });
             });
 
@@ -1650,7 +2048,7 @@
                 select.addEventListener('change', (e) => {
                     const index = parseInt(e.target.dataset.authType);
                     customApis[index].auth.type = e.target.value;
-                    saveApis(customApis);
+                    scheduleSave();
                 });
             });
 
@@ -1658,7 +2056,7 @@
                 input.addEventListener('change', (e) => {
                     const index = parseInt(e.target.dataset.authToken);
                     customApis[index].auth.token = e.target.value;
-                    saveApis(customApis);
+                    scheduleSave();
                 });
             });
 
@@ -1699,6 +2097,7 @@
                                         time: 0,
                                         size: errorMsg.length
                                     });
+                                    scheduleSave();
                                     renderCards();
                                     return;
                                 }
@@ -1739,6 +2138,7 @@
                             headers: headersObj
                         });
                         
+                        scheduleSave();
                         renderCards(); // Re-render to show metrics
                         showToast(`Request completed in ${time}ms`, status >= 200 && status < 300 ? 'success' : 'error');
                         
@@ -1752,6 +2152,7 @@
                             time: 0,
                             size: errorMsg.length
                         });
+                        scheduleSave();
                         renderCards();
                         showToast('Request failed', 'error');
                     }
@@ -1759,10 +2160,10 @@
             });
         }
 
-        renderNav();
-        renderCards();
-        updateCustomCount();
-        portInput.addEventListener('input', () => renderCards());
+        portInput.addEventListener('input', () => { renderCards(); scheduleSave(); });
+
+        // Boot: gate everything behind auth
+        initAuth();
     })();
 </script>
 </body>
