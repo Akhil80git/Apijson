@@ -1185,6 +1185,13 @@
         }
         const deviceId = getDeviceId();
 
+        // Local id generator for new endpoints — optimistic UI: id banta hai
+        // client par hi, turant screen par dikh jaata hai, background mein
+        // sirf isi id ki entry server ko bheji jaati hai.
+        function genLocalId(prefix) {
+            return prefix + '_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+        }
+
         function getToken() { return localStorage.getItem('authToken'); }
         function setToken(t) { localStorage.setItem('authToken', t); }
         function clearToken() { localStorage.removeItem('authToken'); }
@@ -1203,25 +1210,29 @@
 
         // Default APIs (system endpoints - locked) — used only as a local fallback
         // if the backend has nothing yet (should normally be seeded server-side).
+        // Ids yahan bhi same "sys-*" pattern mein hain jo backend seed karta hai.
         const DEFAULT_APIS = [
-            { name: 'Login', method: 'POST', path: '/api/auth/login', description: 'auth', body: JSON.stringify({ email: 'user@ex.com', password: '123456' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'login', isMain: true, hidden: false, isSystem: true },
-            { name: 'Register', method: 'POST', path: '/api/auth/register', description: 'signup', body: JSON.stringify({ username: 'test', email: 'test@a.com', password: 'secret' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'register', isMain: true, hidden: false, isSystem: true },
-            { name: 'OTP', method: 'POST', path: '/api/auth/otp', description: 'request', body: JSON.stringify({ phone: '+919999999999' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'otp', isMain: true, hidden: false, isSystem: true },
-            { name: 'Verify', method: 'POST', path: '/api/auth/verify', description: 'verify', body: JSON.stringify({ email: 'user@ex.com', otp: '123456' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'verify', isMain: true, hidden: false, isSystem: true },
-            { name: 'Profile', method: 'GET', path: '/api/user/profile', description: 'get', body: '', auth: { type: 'bearer', token: '' }, contentType: 'application/json', showAuth: false, group: 'profile', isMain: true, hidden: false, isSystem: true },
-            { name: 'Update', method: 'PUT', path: '/api/user/update', description: 'edit', body: JSON.stringify({ name: 'John' }, null, 2), auth: { type: 'bearer', token: '' }, contentType: 'application/json', showAuth: false, group: 'update', isMain: true, hidden: false, isSystem: true },
-            { name: 'Refresh', method: 'POST', path: '/api/auth/refresh', description: 'token', body: JSON.stringify({ refresh: 'token' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'refresh', isMain: true, hidden: false, isSystem: true },
-            { name: 'Forget', method: 'POST', path: '/api/auth/forgot', description: 'forgot', body: JSON.stringify({ email: 'forgot@ex.com' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'forget', isMain: true, hidden: false, isSystem: true },
-            { name: 'Logout', method: 'POST', path: '/api/auth/logout', description: 'out', body: '', auth: { type: 'bearer', token: '' }, contentType: 'application/json', showAuth: false, group: 'logout', isMain: true, hidden: false, isSystem: true },
-            { name: 'Reset', method: 'POST', path: '/api/auth/reset', description: 'reset', body: JSON.stringify({ pass: 'new123' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'reset', isMain: true, hidden: false, isSystem: true }
+            { id: 'sys-login', name: 'Login', method: 'POST', path: '/api/auth/login', description: 'auth', body: JSON.stringify({ email: 'user@ex.com', password: '123456' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'login', isMain: true, hidden: false, isSystem: true },
+            { id: 'sys-register', name: 'Register', method: 'POST', path: '/api/auth/register', description: 'signup', body: JSON.stringify({ username: 'test', email: 'test@a.com', password: 'secret' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'register', isMain: true, hidden: false, isSystem: true },
+            { id: 'sys-otp', name: 'OTP', method: 'POST', path: '/api/auth/otp', description: 'request', body: JSON.stringify({ phone: '+919999999999' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'otp', isMain: true, hidden: false, isSystem: true },
+            { id: 'sys-verify', name: 'Verify', method: 'POST', path: '/api/auth/verify', description: 'verify', body: JSON.stringify({ email: 'user@ex.com', otp: '123456' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'verify', isMain: true, hidden: false, isSystem: true },
+            { id: 'sys-profile', name: 'Profile', method: 'GET', path: '/api/user/profile', description: 'get', body: '', auth: { type: 'bearer', token: '' }, contentType: 'application/json', showAuth: false, group: 'profile', isMain: true, hidden: false, isSystem: true },
+            { id: 'sys-update', name: 'Update', method: 'PUT', path: '/api/user/update', description: 'edit', body: JSON.stringify({ name: 'John' }, null, 2), auth: { type: 'bearer', token: '' }, contentType: 'application/json', showAuth: false, group: 'update', isMain: true, hidden: false, isSystem: true },
+            { id: 'sys-refresh', name: 'Refresh', method: 'POST', path: '/api/auth/refresh', description: 'token', body: JSON.stringify({ refresh: 'token' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'refresh', isMain: true, hidden: false, isSystem: true },
+            { id: 'sys-forget', name: 'Forget', method: 'POST', path: '/api/auth/forgot', description: 'forgot', body: JSON.stringify({ email: 'forgot@ex.com' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'forget', isMain: true, hidden: false, isSystem: true },
+            { id: 'sys-logout', name: 'Logout', method: 'POST', path: '/api/auth/logout', description: 'out', body: '', auth: { type: 'bearer', token: '' }, contentType: 'application/json', showAuth: false, group: 'logout', isMain: true, hidden: false, isSystem: true },
+            { id: 'sys-reset', name: 'Reset', method: 'POST', path: '/api/auth/reset', description: 'reset', body: JSON.stringify({ pass: 'new123' }, null, 2), auth: { type: 'none', token: '' }, contentType: 'application/json', showAuth: false, group: 'reset', isMain: true, hidden: false, isSystem: true }
         ];
 
         const CUSTOM_COLORS = [
             '#a855f7', '#d946ef', '#c084fc', '#b380ff', '#a78bfa'
         ];
 
+        // customApis: displayed order mein endpoint objects, har ek ke paas .id hota hai.
+        // responseMap: id -> response data (index se nahi, id se — isliye add/remove/duplicate
+        // par kabhi reindex karne ki zaroorat nahi padti).
         let customApis = [];
-        let responseMap = new Map(); // { index: { text, status, time, size, headers, formatted } }
+        let responseMap = new Map();
         let groupCollapsed = {};
         let customCounter = 0;
         let currentHighlight = null;
@@ -1326,32 +1337,80 @@
         authPassword.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitAuth(); });
         authUsername.addEventListener('keydown', (e) => { if (e.key === 'Enter') authPassword.focus(); });
 
-        // ================= REMOTE DATA (replaces localStorage persistence) =================
-        let saveTimer = null;
-        function scheduleSave() {
-            clearTimeout(saveTimer);
-            saveTimer = setTimeout(saveRemoteDataNow, 500);
-        }
-        async function saveRemoteDataNow() {
-            if (!getToken()) return;
-            const responsesObj = {};
-            responseMap.forEach((v, k) => { responsesObj[k] = v; });
-            try {
-                await api('/api/data', {
-                    method: 'POST',
+        // ================= GRANULAR REMOTE SAVES =================
+        // Purane design mein ek hi scheduleSave() poora apis+responses bhejta tha.
+        // Ab har action apni khud ki, sirf-uss-part-ki save call karta hai.
+
+        // Settings (port/theme/filter/collapse/counter) — chhota, debounced.
+        let settingsSaveTimer = null;
+        function scheduleSettingsSave() {
+            clearTimeout(settingsSaveTimer);
+            settingsSaveTimer = setTimeout(() => {
+                if (!getToken()) return;
+                api('/api/data/settings', {
+                    method: 'PUT',
                     body: JSON.stringify({
-                        apis: customApis,
-                        responses: responsesObj,
-                        activeFilterGroup: activeFilterGroup,
+                        activeFilterGroup,
                         port: portInput.value,
-                        customCounter: customCounter,
-                        groupCollapsed: groupCollapsed,
+                        customCounter,
+                        groupCollapsed,
                         theme: document.body.classList.contains('dark-mode') ? 'dark' : 'light'
                     })
-                });
-            } catch (e) {
-                console.error('Save failed', e);
-            }
+                }).catch(e => console.error('Settings save failed', e));
+            }, 500);
+        }
+
+        // Ek endpoint ka config (body/method/path/auth/hidden/showAuth) — debounced PER id,
+        // taaki ek endpoint type karte waqt doosre endpoints ki save calls na ho.
+        const endpointSaveTimers = {};
+        function scheduleEndpointSave(id) {
+            clearTimeout(endpointSaveTimers[id]);
+            endpointSaveTimers[id] = setTimeout(() => {
+                if (!getToken()) return;
+                const apiObj = customApis.find(a => a.id === id);
+                if (!apiObj) return;
+                const { id: _drop, ...config } = apiObj;
+                api(`/api/data/endpoint/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ config })
+                }).catch(e => console.error('Endpoint save failed', e));
+            }, 400);
+        }
+
+        function createEndpointRemote(id, config, afterId) {
+            if (!getToken()) return;
+            api('/api/data/endpoint', {
+                method: 'POST',
+                body: JSON.stringify({ id, config, afterId: afterId || null })
+            }).catch(e => console.error('Create endpoint failed', e));
+        }
+
+        function deleteEndpointRemote(id) {
+            if (!getToken()) return;
+            api(`/api/data/endpoint/${id}`, { method: 'DELETE' }).catch(e => console.error('Delete endpoint failed', e));
+        }
+
+        function saveResponseRemote(id, data) {
+            if (!getToken()) return;
+            api(`/api/data/response/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify({ data })
+            }).catch(e => console.error('Response save failed', e));
+        }
+
+        function deleteResponseRemote(id) {
+            if (!getToken()) return;
+            api(`/api/data/response/${id}`, { method: 'DELETE' }).catch(e => console.error('Delete response failed', e));
+        }
+
+        function clearAllResponsesRemote() {
+            if (!getToken()) return;
+            api('/api/data/responses', { method: 'DELETE' }).catch(e => console.error('Clear all responses failed', e));
+        }
+
+        function clearAllBodiesRemote() {
+            if (!getToken()) return;
+            api('/api/data/endpoints/clear-bodies', { method: 'PUT' }).catch(e => console.error('Clear all bodies failed', e));
         }
 
         async function loadRemoteData() {
@@ -1361,8 +1420,10 @@
                 responseMap = new Map();
                 activeFilterGroup = null;
             } else {
-                customApis = (data.apis && data.apis.length) ? data.apis : JSON.parse(JSON.stringify(DEFAULT_APIS));
-                responseMap = new Map(Object.entries(data.responses || {}).map(([k, v]) => [parseInt(k), v]));
+                const order = (data.endpointOrder && data.endpointOrder.length) ? data.endpointOrder : DEFAULT_APIS.map(a => a.id);
+                const endpoints = (data.endpoints && Object.keys(data.endpoints).length) ? data.endpoints : Object.fromEntries(DEFAULT_APIS.map(a => [a.id, a]));
+                customApis = order.filter(id => endpoints[id]).map(id => ({ id, ...endpoints[id] }));
+                responseMap = new Map(Object.entries(data.responses || {}));
                 activeFilterGroup = data.activeFilterGroup || null;
                 if (data.port) portInput.value = data.port;
                 customCounter = data.customCounter || 0;
@@ -1423,7 +1484,7 @@
             document.body.classList.toggle('dark-mode');
             themeIcon.classList.toggle('bi-sun-fill');
             themeIcon.classList.toggle('bi-moon-stars-fill');
-            scheduleSave();
+            scheduleSettingsSave();
         });
 
         clearFilterBtn.addEventListener('click', () => setFilter(null));
@@ -1440,7 +1501,7 @@
 
         function toggleHide(index) {
             customApis[index].hidden = !customApis[index].hidden;
-            scheduleSave();
+            scheduleEndpointSave(customApis[index].id);
             renderNav();
             renderCards();
         }
@@ -1454,7 +1515,7 @@
             } else {
                 activeFilterGroup = group;
             }
-            scheduleSave();
+            scheduleSettingsSave();
             renderNav();
             renderCards();
             contentArea.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1487,11 +1548,10 @@
         // Clicking the item that is already active just re-scrolls to it — it never
         // clears the pane back to the empty state (that only happens via "Show All").
         function focusItem(index) {
-            const api = customApis[index];
-            if (!api) return;
-            const sameGroupAlreadyActive = activeFilterGroup === api.group;
-            activeFilterGroup = api.group;
-            scheduleSave();
+            const apiEntry = customApis[index];
+            if (!apiEntry) return;
+            activeFilterGroup = apiEntry.group;
+            scheduleSettingsSave();
             renderNav();
             renderCards();
             setTimeout(() => scrollToCard(index), 60);
@@ -1500,15 +1560,16 @@
         // Function to clear request data for a specific card
         function clearRequestData(index) {
             customApis[index].body = '';
-            scheduleSave();
+            scheduleEndpointSave(customApis[index].id);
             renderCards();
             showToast('Request data cleared', 'info');
         }
 
         // Function to clear response for a specific card
         function clearResponse(index) {
-            responseMap.delete(index);
-            scheduleSave();
+            const id = customApis[index].id;
+            responseMap.delete(id);
+            deleteResponseRemote(id);
             renderCards();
             showToast('Response cleared', 'info');
         }
@@ -1516,17 +1577,17 @@
         // Function to clear all responses
         function clearAllResponses() {
             responseMap.clear();
-            scheduleSave();
+            clearAllResponsesRemote();
             renderCards();
             showToast('All responses cleared', 'success');
         }
 
         // Function to clear all request data
         function clearAllRequests() {
-            customApis.forEach(api => {
-                api.body = '';
+            customApis.forEach(apiEntry => {
+                apiEntry.body = '';
             });
-            scheduleSave();
+            clearAllBodiesRemote();
             renderCards();
             showToast('All request data cleared', 'success');
         }
@@ -1571,8 +1632,8 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        function groupColorVar(group, api) {
-            if (group.startsWith('custom-')) return (api && api.customColor) || '#a855f7';
+        function groupColorVar(group, apiEntry) {
+            if (group.startsWith('custom-')) return (apiEntry && apiEntry.customColor) || '#a855f7';
             return `var(--line-${group})`;
         }
 
@@ -1584,8 +1645,10 @@
             const groupName = `custom-${customCounter}`;
             const colorIndex = (customCounter - 1) % CUSTOM_COLORS.length;
             const customColor = CUSTOM_COLORS[colorIndex];
+            const newId = genLocalId('ep');
             
             const newApi = {
+                id: newId,
                 name: name,
                 method: 'GET',
                 path: '/api/custom',
@@ -1602,7 +1665,9 @@
             };
             
             customApis.push(newApi);
-            scheduleSave();
+            const { id: _drop, ...config } = newApi;
+            createEndpointRemote(newId, config, null);
+            scheduleSettingsSave(); // customCounter changed
             activeFilterGroup = groupName;
             renderNav();
             renderCards();
@@ -1616,7 +1681,7 @@
         }
 
         function updateCustomCount() {
-            const count = customApis.filter(api => api.group && api.group.startsWith('custom-') && api.isMain).length;
+            const count = customApis.filter(apiEntry => apiEntry.group && apiEntry.group.startsWith('custom-') && apiEntry.isMain).length;
             customCountSpan.textContent = `✨ ${count}`;
         }
 
@@ -1624,9 +1689,9 @@
 
         function renderNav() {
             const groups = {};
-            customApis.forEach((api, idx) => {
-                if (!groups[api.group]) groups[api.group] = [];
-                groups[api.group].push({ ...api, idx });
+            customApis.forEach((apiEntry, idx) => {
+                if (!groups[apiEntry.group]) groups[apiEntry.group] = [];
+                groups[apiEntry.group].push({ ...apiEntry, idx });
             });
 
             let navHtml = '';
@@ -1700,7 +1765,7 @@
                     header.classList.toggle('collapsed');
                     items.classList.toggle('collapsed');
                     groupCollapsed[group] = items.classList.contains('collapsed');
-                    scheduleSave();
+                    scheduleSettingsSave();
                 });
             });
 
@@ -1726,9 +1791,11 @@
         function duplicateApi(index) {
             const original = customApis[index];
             const copyCount = customApis.filter(a => a.group === original.group && !a.isMain).length + 1;
+            const newId = genLocalId('ep');
             
             const copy = {
                 ...JSON.parse(JSON.stringify(original)),
+                id: newId,
                 name: `${original.name} (${copyCount})`,
                 body: '',
                 showAuth: false,
@@ -1739,18 +1806,15 @@
             };
             
             customApis.splice(index + 1, 0, copy);
-            
-            const newMap = new Map();
-            for (let [k, v] of responseMap.entries()) {
-                if (k <= index) newMap.set(k, v);
-                else newMap.set(k + 1, v);
-            }
-            responseMap = newMap;
-            
+            // Response map ab id-keyed hai, isliye duplicate/insert par kisi bhi
+            // maujooda response ko reindex karne ki zaroorat hi nahi padti.
+            const { id: _drop, ...config } = copy;
+            createEndpointRemote(newId, config, original.id);
+
             // Keep the same group filtered/selected so the right pane never blanks out —
             // duplicating an endpoint should only add a card next to it, nothing else changes.
             activeFilterGroup = original.group;
-            scheduleSave();
+            scheduleSettingsSave();
             renderNav();
             renderCards();
             
@@ -1759,7 +1823,7 @@
 
         function toggleAuth(index) {
             customApis[index].showAuth = !customApis[index].showAuth;
-            scheduleSave();
+            scheduleEndpointSave(customApis[index].id);
             renderCards();
         }
 
@@ -1788,38 +1852,38 @@
                 return;
             }
             
-            customApis.forEach((api, index) => {
-                if (api.hidden) return;
-                if (activeFilterGroup && api.group !== activeFilterGroup) return;
+            customApis.forEach((apiEntry, index) => {
+                if (apiEntry.hidden) return;
+                if (activeFilterGroup && apiEntry.group !== activeFilterGroup) return;
                 
-                const fullUrl = api.fullUrl || buildBaseUrl() + api.path;
-                const responseData = responseMap.get(index);
-                const isCustom = api.group.startsWith('custom-');
+                const fullUrl = apiEntry.fullUrl || buildBaseUrl() + apiEntry.path;
+                const responseData = responseMap.get(apiEntry.id);
+                const isCustom = apiEntry.group.startsWith('custom-');
                 
-                const customStyle = isCustom && api.customColor ? `style="border-left-color: ${api.customColor}; --custom-color: ${api.customColor};"` : '';
+                const customStyle = isCustom && apiEntry.customColor ? `style="border-left-color: ${apiEntry.customColor}; --custom-color: ${apiEntry.customColor};"` : '';
                 
-                html += `<div class="api-row" id="card-${index}" data-group="${api.group}" ${customStyle}>`;
+                html += `<div class="api-row" id="card-${index}" data-group="${apiEntry.group}" ${customStyle}>`;
                 
                 // Header
                 html += `<div class="d-flex flex-wrap align-items-center gap-1 mb-2">`;
-                html += `<span class="method-badge method-${api.method.toLowerCase()}">${api.method}</span>`;
-                html += `<span class="fw-semibold" style="font-size: 0.85rem;">${api.name}</span>`;
+                html += `<span class="method-badge method-${apiEntry.method.toLowerCase()}">${apiEntry.method}</span>`;
+                html += `<span class="fw-semibold" style="font-size: 0.85rem;">${apiEntry.name}</span>`;
                 
-                if (api.isSystem) {
+                if (apiEntry.isSystem) {
                     html += `<span class="locked-badge"><i class="bi bi-lock-fill"></i> system</span>`;
-                } else if (api.isMain) {
+                } else if (apiEntry.isMain) {
                     html += `<span class="${isCustom ? 'custom-badge' : 'main-badge'}">${isCustom ? 'custom' : 'main'}</span>`;
                 }
                 
-                html += `<span class="text-secondary small flex-grow-1">${api.description || ''}</span>`;
-                html += `<span class="group-badge ${isCustom ? 'custom' : ''}">${isCustom ? '✨ custom' : api.group}</span>`;
+                html += `<span class="text-secondary small flex-grow-1">${apiEntry.description || ''}</span>`;
+                html += `<span class="group-badge ${isCustom ? 'custom' : ''}">${isCustom ? '✨ custom' : apiEntry.group}</span>`;
                 
                 html += `<div class="btn-group">`;
                 html += `<button class="btn btn-outline-secondary btn-sm action-btn" data-auth="${index}"><i class="bi bi-shield-lock"></i></button>`;
                 html += `<button class="btn btn-outline-primary btn-sm action-btn" data-duplicate="${index}"><i class="bi bi-files"></i></button>`;
                 
                 // Show delete button only for non-system endpoints
-                if (api.isSystem) {
+                if (apiEntry.isSystem) {
                     html += `<span class="btn btn-outline-secondary btn-sm action-btn disabled" style="opacity: 0.6; cursor: not-allowed;" title="System endpoint - cannot delete"><i class="bi bi-lock-fill"></i></span>`;
                 } else {
                     html += `<button class="btn btn-outline-danger btn-sm action-btn" data-delete="${index}"><i class="bi bi-trash"></i></button>`;
@@ -1832,24 +1896,24 @@
                 html += `<div class="d-flex gap-1 mb-2">`;
                 html += `<select class="form-select method-select" data-method="${index}" style="width: auto; min-width: 70px;">`;
                 ['GET','POST','PUT','DELETE'].forEach(m => {
-                    html += `<option value="${m}" ${api.method === m ? 'selected' : ''}>${m}</option>`;
+                    html += `<option value="${m}" ${apiEntry.method === m ? 'selected' : ''}>${m}</option>`;
                 });
                 html += `</select>`;
-                html += `<input type="text" class="form-control url-box" value="${api.fullUrl || api.path}" data-path="${index}">`;
+                html += `<input type="text" class="form-control url-box" value="${apiEntry.fullUrl || apiEntry.path}" data-path="${index}">`;
                 html += `</div>`;
 
                 // Auth Panel
-                if (api.showAuth) {
+                if (apiEntry.showAuth) {
                     html += `<div class="auth-panel">`;
                     html += `<div class="row g-2">`;
                     html += `<div class="col-4">`;
                     html += `<select class="form-select form-select-sm" data-auth-type="${index}">`;
-                    html += `<option value="none" ${api.auth.type === 'none' ? 'selected' : ''}>None</option>`;
-                    html += `<option value="bearer" ${api.auth.type === 'bearer' ? 'selected' : ''}>Bearer</option>`;
+                    html += `<option value="none" ${apiEntry.auth.type === 'none' ? 'selected' : ''}>None</option>`;
+                    html += `<option value="bearer" ${apiEntry.auth.type === 'bearer' ? 'selected' : ''}>Bearer</option>`;
                     html += `</select>`;
                     html += `</div>`;
                     html += `<div class="col-5">`;
-                    html += `<input type="text" class="form-control form-control-sm" value="${api.auth.token || ''}" data-auth-token="${index}" placeholder="token">`;
+                    html += `<input type="text" class="form-control form-control-sm" value="${apiEntry.auth.token || ''}" data-auth-token="${index}" placeholder="token">`;
                     html += `</div>`;
                     html += `<div class="col-3">`;
                     html += `<select class="form-select form-select-sm" data-content-type="${index}">`;
@@ -1870,7 +1934,7 @@
                 html += `<span class="small fw-semibold"><i class="bi bi-pencil-square me-1"></i>Request Body</span>`;
                 html += `<button class="btn-clear-request btn-sm" data-clear-request="${index}"><i class="bi bi-eraser"></i> Clear</button>`;
                 html += `</div>`;
-                html += `<textarea class="form-control request-textarea" data-body="${index}" rows="2" placeholder='{\n  "key": "value"\n}'>${api.body || ''}</textarea>`;
+                html += `<textarea class="form-control request-textarea" data-body="${index}" rows="2" placeholder='{\n  "key": "value"\n}'>${apiEntry.body || ''}</textarea>`;
                 html += `</div>`;
                 html += `</div>`;
                 
@@ -1925,7 +1989,7 @@
                     this.timeout = setTimeout(() => {
                         const index = parseInt(this.dataset.body);
                         customApis[index].body = this.value;
-                        scheduleSave();
+                        scheduleEndpointSave(customApis[index].id);
                     }, 300);
                 });
             });
@@ -1959,7 +2023,7 @@
             document.querySelectorAll('[data-copy-response]').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     const index = parseInt(btn.dataset.copyResponse);
-                    const responseData = responseMap.get(index);
+                    const responseData = responseMap.get(customApis[index].id);
                     if (responseData) {
                         await copyToClipboard(responseData.text, index);
                     }
@@ -1970,14 +2034,15 @@
             document.querySelectorAll('[data-format-response]').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const index = parseInt(btn.dataset.formatResponse);
-                    const responseData = responseMap.get(index);
+                    const id = customApis[index].id;
+                    const responseData = responseMap.get(id);
                     if (responseData) {
                         const formatted = formatJson(responseData.text);
                         if (formatted !== responseData.text) {
                             responseData.text = formatted;
                             responseData.formatted = true;
-                            responseMap.set(index, responseData);
-                            scheduleSave();
+                            responseMap.set(id, responseData);
+                            saveResponseRemote(id, responseData);
                             renderCards();
                             showToast('JSON formatted', 'success');
                         }
@@ -1988,31 +2053,28 @@
             document.querySelectorAll('[data-delete]').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const index = parseInt(btn.dataset.delete);
-                    const api = customApis[index];
+                    const apiEntry = customApis[index];
                     
                     // Double-check: prevent deletion of system endpoints
-                    if (api.isSystem) {
+                    if (apiEntry.isSystem) {
                         showToast('System endpoints cannot be deleted', 'error');
                         return;
                     }
                     
                     if (confirm('Delete this endpoint?')) {
-                        const deletedGroup = api.group;
+                        const deletedGroup = apiEntry.group;
+                        const deletedId = apiEntry.id;
                         customApis.splice(index, 1);
-                        const newMap = new Map();
-                        for (let [k, v] of responseMap.entries()) {
-                            if (k < index) newMap.set(k, v);
-                            else if (k > index) newMap.set(k-1, v);
-                        }
-                        responseMap = newMap;
+                        responseMap.delete(deletedId);
+                        deleteEndpointRemote(deletedId);
 
                         // Keep viewing whatever remains of this group (if the group still
                         // has endpoints left, e.g. the main one). Only fall back to the
                         // empty state if that was genuinely the last endpoint in the group.
                         const groupStillHasEntries = customApis.some(a => a.group === deletedGroup);
                         activeFilterGroup = groupStillHasEntries ? deletedGroup : activeFilterGroup;
+                        scheduleSettingsSave();
 
-                        scheduleSave();
                         updateCustomCount();
                         renderNav();
                         renderCards();
@@ -2025,7 +2087,7 @@
                 select.addEventListener('change', (e) => {
                     const index = parseInt(e.target.dataset.method);
                     customApis[index].method = e.target.value;
-                    scheduleSave();
+                    scheduleEndpointSave(customApis[index].id);
                 });
             });
 
@@ -2040,7 +2102,7 @@
                         customApis[index].path = val;
                         delete customApis[index].fullUrl;
                     }
-                    scheduleSave();
+                    scheduleEndpointSave(customApis[index].id);
                 });
             });
 
@@ -2048,7 +2110,7 @@
                 select.addEventListener('change', (e) => {
                     const index = parseInt(e.target.dataset.authType);
                     customApis[index].auth.type = e.target.value;
-                    scheduleSave();
+                    scheduleEndpointSave(customApis[index].id);
                 });
             });
 
@@ -2056,53 +2118,55 @@
                 input.addEventListener('change', (e) => {
                     const index = parseInt(e.target.dataset.authToken);
                     customApis[index].auth.token = e.target.value;
-                    scheduleSave();
+                    scheduleEndpointSave(customApis[index].id);
                 });
             });
 
             document.querySelectorAll('[data-send]').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     const index = parseInt(btn.dataset.send);
-                    const api = customApis[index];
-                    const url = api.fullUrl || buildBaseUrl() + api.path;
+                    const apiEntry = customApis[index];
+                    const id = apiEntry.id;
+                    const url = apiEntry.fullUrl || buildBaseUrl() + apiEntry.path;
                     const responsePre = document.getElementById(`response-${index}`);
                     
                     try {
                         responsePre.innerHTML = '⏳ Sending request...';
                         
                         const headers = { 'Accept': 'application/json' };
-                        if (api.contentType) headers['Content-Type'] = api.contentType;
-                        if (api.auth.type === 'bearer' && api.auth.token) {
-                            headers['Authorization'] = `Bearer ${api.auth.token}`;
+                        if (apiEntry.contentType) headers['Content-Type'] = apiEntry.contentType;
+                        if (apiEntry.auth.type === 'bearer' && apiEntry.auth.token) {
+                            headers['Authorization'] = `Bearer ${apiEntry.auth.token}`;
                         }
                         
                         const fetchOptions = { 
-                            method: api.method, 
+                            method: apiEntry.method, 
                             headers,
                             mode: 'cors'
                         };
 
-                        if (api.body && ['POST','PUT','PATCH'].includes(api.method)) {
-                            if (api.contentType?.includes('application/json')) {
+                        if (apiEntry.body && ['POST','PUT','PATCH'].includes(apiEntry.method)) {
+                            if (apiEntry.contentType?.includes('application/json')) {
                                 try {
-                                    JSON.parse(api.body);
-                                    fetchOptions.body = api.body;
+                                    JSON.parse(apiEntry.body);
+                                    fetchOptions.body = apiEntry.body;
                                 } catch (e) {
                                     const errorMsg = `❌ Invalid JSON:\n${e.message}`;
                                     responsePre.innerHTML = errorMsg;
-                                    responseMap.set(index, { 
+                                    const errData = { 
                                         text: errorMsg,
                                         status: 400,
                                         statusText: 'Bad Request',
                                         time: 0,
                                         size: errorMsg.length
-                                    });
-                                    scheduleSave();
+                                    };
+                                    responseMap.set(id, errData);
+                                    saveResponseRemote(id, errData);
                                     renderCards();
                                     return;
                                 }
                             } else {
-                                fetchOptions.body = api.body;
+                                fetchOptions.body = apiEntry.body;
                             }
                         }
                         
@@ -2129,30 +2193,35 @@
                         const final = responseText;
                         responsePre.innerHTML = final;
                         
-                        responseMap.set(index, { 
+                        // Yeh sirf isi endpoint (id) ka response DB mein set karta hai —
+                        // purana response usi id ke against replace ho jaata hai, baaki
+                        // sab endpoints/responses ko yeh call bilkul touch nahi karti.
+                        const respData = { 
                             text: final,
                             status: status,
                             statusText: statusText,
                             time: time,
                             size: size,
                             headers: headersObj
-                        });
+                        };
+                        responseMap.set(id, respData);
+                        saveResponseRemote(id, respData);
                         
-                        scheduleSave();
                         renderCards(); // Re-render to show metrics
                         showToast(`Request completed in ${time}ms`, status >= 200 && status < 300 ? 'success' : 'error');
                         
                     } catch (err) {
                         const errorMsg = `❌ Error: ${err.message}`;
                         responsePre.innerHTML = errorMsg;
-                        responseMap.set(index, { 
+                        const errData = { 
                             text: errorMsg,
                             status: 0,
                             statusText: 'Network Error',
                             time: 0,
                             size: errorMsg.length
-                        });
-                        scheduleSave();
+                        };
+                        responseMap.set(id, errData);
+                        saveResponseRemote(id, errData);
                         renderCards();
                         showToast('Request failed', 'error');
                     }
@@ -2160,7 +2229,7 @@
             });
         }
 
-        portInput.addEventListener('input', () => { renderCards(); scheduleSave(); });
+        portInput.addEventListener('input', () => { renderCards(); scheduleSettingsSave(); });
 
         // Boot: gate everything behind auth
         initAuth();
